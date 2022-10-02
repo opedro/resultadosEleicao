@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+
+<body>
+
+    <h2>apuracao</h2>
+    <button type="button" onclick="reloadApuracao()">reload</button>
+
+    <li id="apuracao"></li>
+
+    <script>
+        function trataApuracao(jsonApuracao) {
+            const apuracao = document.getElementById("apuracao");
+            apuracao.innerHTML = "";
+            jsonApuracao.cand.forEach(function (candidato) {
+                const node = document.createElement("li");
+                const textnode = document.createTextNode(candidato.nm + " " + candidato.pvap);
+                node.appendChild(textnode);
+                apuracao.appendChild(node);
+            });
+        }
+        function reloadApuracao() {
+            const xhttp = new XMLHttpRequest();
+            xhttp.onload = function () {
+                trataApuracao(JSON.parse(this.responseText))
+            }
+            xhttp.open("GET", "https://resultados.tse.jus.br/oficial/ele2022/544/dados-simplificados/br/br-c0001-e000544-r.json");
+            xhttp.send();
+        }
+    </script>
+
+</body>
+
+</html>
