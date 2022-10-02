@@ -5,7 +5,6 @@
 
     <h2 id="titulo"></h2>
     <button type="button" onclick="reloadApuracao()">Forçar Reload</button>
-    Carregando a cada
     <li id="apuracao"></li>
 
     <script>
@@ -28,7 +27,6 @@
             }
             xhttp.open("GET", "https://resultados.tse.jus.br/oficial/ele2022/544/dados-simplificados/br/br-c0001-e000544-r.json");
             xhttp.send();
-            setTimeout(reloadApuracao(), 10000);
         }
 
     </script>
