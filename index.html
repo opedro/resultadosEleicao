@@ -13,7 +13,7 @@
             const titulo = document.getElementById("titulo");
             const apuracao = document.getElementById("apuracao");
             apuracao.innerHTML = "";
-            titulo.innerHTML = jsonApuracao.pst + " urnas apuradas";
+            titulo.innerHTML = jsonApuracao.pst + "% das urnas apuradas";
             jsonApuracao.cand.forEach(function (candidato) {
                 const node = document.createElement("li");
                 const textnode = document.createTextNode(candidato.nm + " " + candidato.pvap);
