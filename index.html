@@ -12,7 +12,7 @@
             const titulo = document.getElementById("titulo");
             const apuracao = document.getElementById("apuracao");
             apuracao.innerHTML = "";
-            titulo.innerHTML = jsonApuracao.pst + "% das urnas apuradas (" +jsonApuracao.cand[0].pvap - jsonApuracao.cand[1].pvap +")";
+            titulo.innerHTML = jsonApuracao.pst + "% das urnas apuradas";
             jsonApuracao.cand.forEach(function (candidato) {
                 const node = document.createElement("li");
                 const textnode = document.createTextNode(
