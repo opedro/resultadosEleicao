@@ -5,32 +5,38 @@
 
     <h2 id="titulo"></h2>
     <button type="button" onclick="reloadApuracao()">Reload</button>
-    <li id="apuracao"></li>
+    <ul id="apuracao"></ul>
 
     <script>
         function trataApuracao(jsonApuracao) {
             const titulo = document.getElementById("titulo");
             const apuracao = document.getElementById("apuracao");
             apuracao.innerHTML = "";
-            titulo.innerHTML = jsonApuracao.pst + "% das urnas apuradas";
-            jsonApuracao.cand.forEach(function (candidato) {
-                const node = document.createElement("li");
-                const textnode = document.createTextNode(
-                    candidato.nm + "\t" + candidato.vap + "\t(" + candidato.pvap + "%)"
-                    );
-                node.appendChild(textnode);
-                apuracao.appendChild(node);
+            
+            titulo.innerHTML = jsonApuracao.s.pst + "% das urnas apuradas";
+
+            jsonApuracao.carg[0].agr.forEach(function (grupo) {
+                grupo.par.forEach(function (partido) {
+                    partido.cand.forEach(function (candidato) {
+                        const node = document.createElement("li");
+                        const textnode = document.createTextNode(
+                            candidato.nm + ": " + candidato.pvap + "%"
+                        );
+                        node.appendChild(textnode);
+                        apuracao.appendChild(node);
+                    });
+                });
             });
         }
+
         function reloadApuracao() {
             const xhttp = new XMLHttpRequest();
             xhttp.onload = function () {
-                trataApuracao(JSON.parse(this.responseText))
-            }
-            xhttp.open("GET", "https://resultados.tse.jus.br/oficial/ele2022/544/dados-simplificados/br/br-c0001-e000544-r.json");
+                trataApuracao(JSON.parse(this.responseText));
+            };
+            xhttp.open("GET", "https://resultados.tse.jus.br/oficial/ele2024/619/dados/sp/sp71072-c0011-e000619-u.json");
             xhttp.send();
         }
-
     </script>
 
 </body>
