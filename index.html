@@ -52,6 +52,24 @@
         </tr>
     </table>
 
+    <h2>Apuração na cidade de São Paulo</h2>
+    <table border="1" cellpadding="8" cellspacing="0" width="100%">
+        <tr>
+            <th>Presidente</th>
+            <th>Governador</th>
+        </tr>
+        <tr valign="top">
+            <td>
+                <p id="titulo-sp-p-municipio"></p>
+                <ul id="apuracao-sp-p-municipio"></ul>
+            </td>
+            <td>
+                <p id="titulo-sp-g-municipio"></p>
+                <ul id="apuracao-sp-g-municipio"></ul>
+            </td>
+        </tr>
+    </table>
+
     <script>
         let timeLeft = 10;
         const regioes = {
@@ -67,7 +85,8 @@
             const apuracao = document.getElementById(apuracaoId);
             apuracao.innerHTML = "";
 
-            titulo.innerHTML = (jsonApuracao.s && jsonApuracao.s.pst ? jsonApuracao.s.pst : "0") + "% das urnas apuradas";
+            const abrangencia = jsonApuracao.tpabr === "mu" ? " das urnas apuradas em São Paulo" : " das urnas apuradas";
+            titulo.innerHTML = (jsonApuracao.s && jsonApuracao.s.pst ? jsonApuracao.s.pst : "0") + "%" + abrangencia;
 
             const candidatos = [];
             (jsonApuracao.carg || []).forEach(function (cargo) {
@@ -109,7 +128,9 @@
             const xhttp = new XMLHttpRequest();
             const cargo = {
                 "titulo-sp-g": "Governador",
-                "titulo-sp-s": "Senador"
+                "titulo-sp-s": "Senador",
+                "titulo-sp-g-municipio": "Governador",
+                "titulo-sp-p-municipio": "Presidente"
             }[tituloId];
             const exibeErro = function (status) {
                 const detalhe = cargo && status === 404
@@ -154,6 +175,14 @@
 
         function reloadApuracaoSpSenador() {
             carregaApuracao("https://resultados.tse.jus.br/oficial/ele2026/6259/dados/sp/sp-c0005-e006259-u.json", "titulo-sp-s", "apuracao-sp-s");
+        }
+
+        function reloadApuracaoCidadeSpPresidente() {
+            carregaApuracao("https://resultados.tse.jus.br/oficial/ele2026/6257/dados/sp/sp71072-c0001-e006257-u.json", "titulo-sp-p-municipio", "apuracao-sp-p-municipio");
+        }
+
+        function reloadApuracaoCidadeSpGovernador() {
+            carregaApuracao("https://resultados.tse.jus.br/oficial/ele2026/6259/dados/sp/sp71072-c0003-e006259-u.json", "titulo-sp-g-municipio", "apuracao-sp-g-municipio");
         }
 
         function reloadApuracaoUfs() {
@@ -222,6 +251,8 @@
             reloadApuracaoSpGovernador();
             reloadApuracaoSpSenador();
             reloadApuracaoUfs();
+            reloadApuracaoCidadeSpPresidente();
+            reloadApuracaoCidadeSpGovernador();
             timeLeft = 10;
         }
 
