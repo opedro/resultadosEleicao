@@ -1,7 +1,9 @@
 <!DOCTYPE html>
+
 <html>
 
 <body>
+
 
     <h2 id="titulo"></h2>
     <button type="button" onclick="reloadApuracao()">Reload</button>
@@ -12,7 +14,7 @@
             const titulo = document.getElementById("titulo");
             const apuracao = document.getElementById("apuracao");
             apuracao.innerHTML = "";
-            
+
             titulo.innerHTML = jsonApuracao.s.pst + "% das urnas apuradas";
 
             jsonApuracao.carg[0].agr.forEach(function (grupo) {
@@ -34,10 +36,11 @@
             xhttp.onload = function () {
                 trataApuracao(JSON.parse(this.responseText));
             };
-            xhttp.open("GET", "https://resultados.tse.jus.br/oficial/ele2024/619/dados/sp/sp71072-c0011-e000619-u.json");
+            xhttp.open("GET", "https://resultados.tse.jus.br/oficial/ele2026/6257/dados/br/br-c0001-e006257-u.json");
             xhttp.send();
         }
     </script>
+
 
 </body>
 
