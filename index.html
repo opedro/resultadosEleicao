@@ -4,24 +4,53 @@
 
 <body>
 
+    <p>Próxima atualização em: <span id="contador">10</span>s</p>
+    <button type="button" onclick="reloadAll()">Reload</button>
 
-    <h2 id="titulo"></h2>
-    <button type="button" onclick="reloadApuracao()">Reload</button>
-    <ul id="apuracao"></ul>
+    <table border="1" cellpadding="8" cellspacing="0" width="100%">
+        <tr>
+            <td valign="top">
+                <h2>Brasil - Presidente</h2>
+                <p id="titulo"></p>
+                <ul id="apuracao"></ul>
+            </td>
+            <td valign="top">
+                <h2>São Paulo (SP) - Presidente</h2>
+                <p id="titulo-sp-p"></p>
+                <ul id="apuracao-sp-p"></ul>
+            </td>
+        </tr>
+        <tr>
+            <td valign="top">
+                <h2>São Paulo (SP) - Governador</h2>
+                <p id="titulo-sp-g"></p>
+                <ul id="apuracao-sp-g"></ul>
+            </td>
+            <td valign="top">
+                <h2>São Paulo (SP) - Senador</h2>
+                <p id="titulo-sp-s"></p>
+                <ul id="apuracao-sp-s"></ul>
+            </td>
+        </tr>
+    </table>
 
     <script>
-        function trataApuracao(jsonApuracao) {
-            const titulo = document.getElementById("titulo");
-            const apuracao = document.getElementById("apuracao");
+        let timeLeft = 10;
+
+        function trataApuracaoGenerica(jsonApuracao, tituloId, apuracaoId) {
+            const titulo = document.getElementById(tituloId);
+            const apuracao = document.getElementById(apuracaoId);
             apuracao.innerHTML = "";
 
-            titulo.innerHTML = jsonApuracao.s.pst + "% das urnas apuradas";
+            titulo.innerHTML = (jsonApuracao.s && jsonApuracao.s.pst ? jsonApuracao.s.pst : "0") + "% das urnas apuradas";
 
             const candidatos = [];
-            jsonApuracao.carg[0].agr.forEach(function (grupo) {
-                grupo.par.forEach(function (partido) {
-                    partido.cand.forEach(function (candidato) {
-                        candidatos.push(candidato);
+            (jsonApuracao.carg || []).forEach(function (cargo) {
+                (cargo.agr || []).forEach(function (grupo) {
+                    (grupo.par || []).forEach(function (partido) {
+                        (partido.cand || []).forEach(function (candidato) {
+                            candidatos.push(candidato);
+                        });
                     });
                 });
             });
@@ -51,16 +80,80 @@
             });
         }
 
-        function reloadApuracao() {
+        function carregaApuracao(url, tituloId, apuracaoId) {
             const xhttp = new XMLHttpRequest();
-            xhttp.onload = function () {
-                trataApuracao(JSON.parse(this.responseText));
+            const cargo = {
+                "titulo-sp-g": "Governador",
+                "titulo-sp-s": "Senador"
+            }[tituloId];
+            const exibeErro = function (status) {
+                const detalhe = cargo && status === 404
+                    ? "Dados de " + cargo + " ainda não disponíveis no TSE (HTTP 404)."
+                    : "Não foi possível carregar a apuração.";
+                document.getElementById(tituloId).innerText = detalhe;
+                document.getElementById(apuracaoId).innerHTML = "";
             };
-            xhttp.open("GET", "https://resultados.tse.jus.br/oficial/ele2026/6257/dados/br/br-c0001-e006257-u.json");
+            xhttp.onload = function () {
+                if (this.status < 200 || this.status >= 300) {
+                    exibeErro(this.status);
+                    console.error("Falha ao carregar apuração:", url, this.status);
+                    return;
+                }
+
+                try {
+                    trataApuracaoGenerica(JSON.parse(this.responseText), tituloId, apuracaoId);
+                } catch (error) {
+                    exibeErro();
+                    console.error("Resposta inválida da apuração:", url, error);
+                }
+            };
+            xhttp.onerror = function () {
+                exibeErro();
+                console.error("Erro de rede ao carregar apuração:", url);
+            };
+            xhttp.open("GET", url);
             xhttp.send();
         }
-    </script>
 
+        function reloadApuracaoBr() {
+            carregaApuracao("https://resultados.tse.jus.br/oficial/ele2026/6257/dados/br/br-c0001-e006257-u.json", "titulo", "apuracao");
+        }
+
+        function reloadApuracaoSpPresidente() {
+            carregaApuracao("https://resultados.tse.jus.br/oficial/ele2026/6257/dados/sp/sp-c0001-e006257-u.json", "titulo-sp-p", "apuracao-sp-p");
+        }
+
+        function reloadApuracaoSpGovernador() {
+            carregaApuracao("https://resultados.tse.jus.br/oficial/ele2026/6259/dados/sp/sp-c0003-e006259-u.json", "titulo-sp-g", "apuracao-sp-g");
+        }
+
+        function reloadApuracaoSpSenador() {
+            carregaApuracao("https://resultados.tse.jus.br/oficial/ele2026/6259/dados/sp/sp-c0005-e006259-u.json", "titulo-sp-s", "apuracao-sp-s");
+        }
+
+        function reloadAll() {
+            reloadApuracaoBr();
+            reloadApuracaoSpPresidente();
+            reloadApuracaoSpGovernador();
+            reloadApuracaoSpSenador();
+            timeLeft = 10;
+        }
+
+        // Carrega inicialmente
+        reloadAll();
+
+        // Timer de contagem regressiva a cada 1 segundo
+        setInterval(function () {
+            timeLeft--;
+            if (timeLeft <= 0) {
+                reloadAll();
+            }
+            const contadorEl = document.getElementById("contador");
+            if (contadorEl) {
+                contadorEl.innerText = timeLeft;
+            }
+        }, 1000);
+    </script>
 
 </body>
 
