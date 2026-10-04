@@ -174,6 +174,15 @@
             font-size: 0.78rem;
         }
 
+        .vote-totals {
+            margin-top: 10px !important;
+            padding-top: 8px;
+            color: #53657d;
+            border-top: 1px solid #edf1f6;
+            font-size: 0.72rem !important;
+            line-height: 1.5;
+        }
+
         .data-table ul {
             margin: 0;
             padding-left: 18px;
@@ -216,6 +225,13 @@
         .deputies-table th {
             color: #18345a;
             background: #e8eef6;
+        }
+
+        .deputy-totals {
+            margin: 8px 10px;
+            color: #53657d;
+            font-size: 0.78rem;
+            line-height: 1.5;
         }
 
         .deputies-table col.rank-column {
@@ -451,11 +467,13 @@
                         <h2>Brasil <span aria-hidden="true">·</span> Presidente</h2>
                         <p id="titulo"></p>
                         <ul id="apuracao"></ul>
+                        <p class="vote-totals" id="apuracao-totais"></p>
                     </td>
                     <td>
                         <h2><span id="titulo-uf-presidente">São Paulo (SP)</span> <span aria-hidden="true">·</span> Presidente</h2>
                         <p id="titulo-sp-p"></p>
                         <ul id="apuracao-sp-p"></ul>
+                        <p class="vote-totals" id="apuracao-sp-p-totais"></p>
                     </td>
                 </tr>
                 <tr>
@@ -463,11 +481,13 @@
                         <h2><span id="titulo-uf-governador">São Paulo (SP)</span> <span aria-hidden="true">·</span> Governador</h2>
                         <p id="titulo-sp-g"></p>
                         <ul id="apuracao-sp-g"></ul>
+                        <p class="vote-totals" id="apuracao-sp-g-totais"></p>
                     </td>
                     <td>
                         <h2><span id="titulo-uf-senador">São Paulo (SP)</span> <span aria-hidden="true">·</span> Senador</h2>
                         <p id="titulo-sp-s"></p>
                         <ul id="apuracao-sp-s"></ul>
+                        <p class="vote-totals" id="apuracao-sp-s-totais"></p>
                     </td>
                 </tr>
             </table>
@@ -510,10 +530,12 @@
                     <td>
                         <p id="titulo-sp-p-municipio"></p>
                         <ul id="apuracao-sp-p-municipio"></ul>
+                        <p class="vote-totals" id="apuracao-sp-p-municipio-totais"></p>
                     </td>
                     <td>
                         <p id="titulo-sp-g-municipio"></p>
                         <ul id="apuracao-sp-g-municipio"></ul>
+                        <p class="vote-totals" id="apuracao-sp-g-municipio-totais"></p>
                     </td>
                 </tr>
             </table>
@@ -551,6 +573,8 @@
                     <tr><td colspan="6">Selecione uma UF para carregar os resultados.</td></tr>
                 </tbody>
             </table>
+            <p class="deputy-totals" id="totais-deputados-federais"></p>
+            <p class="deputy-totals" id="totais-deputados-estaduais"></p>
         </section>
     </main>
 
@@ -709,11 +733,36 @@
             carregaTopDezDeputados(uf, geracao);
         }
 
+        function extraiTotaisVotacao(dados) {
+            return {
+                abstencoes: dados.e && dados.e.a,
+                nulos: dados.v && dados.v.tvn,
+                brancos: dados.v && dados.v.vb
+            };
+        }
+
+        function formataTotalVotacao(valor) {
+            if (valor === undefined || valor === null || valor === "") {
+                return "Indisponível";
+            }
+
+            const numero = Number(valor);
+            return Number.isFinite(numero) ? numero.toLocaleString("pt-BR") : "Indisponível";
+        }
+
+        function textoTotaisVotacao(totais) {
+            return "Abstenções: " + formataTotalVotacao(totais.abstencoes)
+                + " · Nulos: " + formataTotalVotacao(totais.nulos)
+                + " · Brancos: " + formataTotalVotacao(totais.brancos);
+        }
+
         function carregaTopDezDeputados(uf, geracao) {
             const urlFederal = "https://resultados.tse.jus.br/oficial/ele2026/6259/dados/" + uf + "/" + uf + "-c0006-e006259-u.json";
             const urlEstadual = "https://resultados.tse.jus.br/oficial/ele2026/6259/dados/" + uf + "/" + uf + "-c0007-e006259-u.json";
             let candidatosFederais = null;
             let candidatosEstaduais = null;
+            let totaisFederais = null;
+            let totaisEstaduais = null;
             let erro = null;
 
             function atualizaTabela() {
@@ -722,8 +771,8 @@
                 }
                 if (erro) {
                     exibeErroTopDezDeputados(erro);
-                } else if (candidatosFederais && candidatosEstaduais) {
-                    renderizaTopDezDeputados(candidatosFederais, candidatosEstaduais);
+                } else if (candidatosFederais && candidatosEstaduais && totaisFederais && totaisEstaduais) {
+                    renderizaTopDezDeputados(candidatosFederais, candidatosEstaduais, totaisFederais, totaisEstaduais);
                 }
             }
 
@@ -756,7 +805,7 @@
                         candidatos.sort(function (a, b) {
                             return (Number(b.vap) || 0) - (Number(a.vap) || 0);
                         });
-                        aoCarregar(candidatos.slice(0, 10));
+                        aoCarregar(candidatos.slice(0, 10), extraiTotaisVotacao(dados));
                         atualizaTabela();
                     } catch (error) {
                         erro = error;
@@ -776,17 +825,21 @@
                 xhttp.send();
             }
 
-            carregaCandidatos(urlFederal, function (candidatos) {
+            carregaCandidatos(urlFederal, function (candidatos, totais) {
                 candidatosFederais = candidatos;
+                totaisFederais = totais;
             });
-            carregaCandidatos(urlEstadual, function (candidatos) {
+            carregaCandidatos(urlEstadual, function (candidatos, totais) {
                 candidatosEstaduais = candidatos;
+                totaisEstaduais = totais;
             });
         }
 
-        function renderizaTopDezDeputados(federais, estaduais) {
+        function renderizaTopDezDeputados(federais, estaduais, totaisFederais, totaisEstaduais) {
             const tabela = document.getElementById("apuracao-deputados");
             tabela.innerHTML = "";
+            document.getElementById("totais-deputados-federais").innerText = "Deputado federal — " + textoTotaisVotacao(totaisFederais);
+            document.getElementById("totais-deputados-estaduais").innerText = "Deputado estadual — " + textoTotaisVotacao(totaisEstaduais);
 
             for (let index = 0; index < 10; index++) {
                 const linha = document.createElement("tr");
@@ -818,12 +871,15 @@
             celula.appendChild(document.createTextNode("Não foi possível carregar os resultados de deputados (" + erro + ")."));
             linha.appendChild(celula);
             tabela.appendChild(linha);
+            document.getElementById("totais-deputados-federais").innerText = "";
+            document.getElementById("totais-deputados-estaduais").innerText = "";
         }
 
         function trataApuracaoGenerica(jsonApuracao, tituloId, apuracaoId) {
             const titulo = document.getElementById(tituloId);
             const apuracao = document.getElementById(apuracaoId);
             apuracao.innerHTML = "";
+            document.getElementById(apuracaoId + "-totais").innerText = textoTotaisVotacao(extraiTotaisVotacao(jsonApuracao));
 
             const abrangencia = jsonApuracao.tpabr === "mu"
                 ? " das urnas apuradas em " + (capitalSelecionada ? capitalSelecionada.nm : "na capital")
@@ -883,6 +939,7 @@
                     : "Não foi possível carregar a apuração.";
                 document.getElementById(tituloId).innerText = detalhe;
                 document.getElementById(apuracaoId).innerHTML = "";
+                document.getElementById(apuracaoId + "-totais").innerText = "";
             };
             xhttp.onload = function () {
                 if (geracao !== undefined && geracao !== geracaoSelecao) {
