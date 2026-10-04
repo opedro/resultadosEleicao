@@ -64,7 +64,7 @@
             candidatos.forEach(function (candidato, index) {
                 const node = document.createElement("li");
                 const textnode = document.createTextNode(
-                    candidato.nm + ": " + candidato.pvap + "%"
+                    candidato.nm + ": (" + Number(candidato.vap || 0).toLocaleString("pt-BR") + ") " + candidato.pvap + "%"
                 );
                 node.appendChild(textnode);
 
