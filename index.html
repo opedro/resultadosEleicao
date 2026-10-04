@@ -102,6 +102,25 @@
             outline-offset: 3px;
         }
 
+        .state-selector {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #e4eef8;
+            font-size: 0.85rem;
+            white-space: nowrap;
+        }
+
+        .state-selector select {
+            min-width: 150px;
+            padding: 9px 30px 9px 11px;
+            color: #123252;
+            background: #fff;
+            border: 0;
+            border-radius: 8px;
+            font: inherit;
+        }
+
         .section {
             margin-top: 34px;
         }
@@ -182,6 +201,32 @@
         .regions-table li {
             padding: 4px 0;
             border-bottom: 1px solid #edf1f6;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .deputies-table th, .deputies-table td {
+            padding: 8px 10px;
+            text-align: left;
+            vertical-align: top;
+            background: #fff;
+            border: 0;
+            border-radius: 8px;
+        }
+
+        .deputies-table th {
+            color: #18345a;
+            background: #e8eef6;
+        }
+
+        .deputies-table td:first-child, .deputies-table td:nth-child(4) {
+            width: 48px;
+            color: #64748b;
+            text-align: center;
+        }
+
+        .deputies-table td:nth-child(3), .deputies-table td:nth-child(6) {
+            width: 120px;
+            text-align: right;
             font-variant-numeric: tabular-nums;
         }
 
@@ -268,6 +313,7 @@
             .refresh-controls {
                 width: 100%;
                 justify-content: space-between;
+                flex-wrap: wrap;
             }
 
             .results-grid {
@@ -295,10 +341,16 @@
         <div>
             <p class="eyebrow">Eleições 2026 · resultados em tempo real</p>
             <h1>Painel de apuração</h1>
-            <p class="description">Acompanhe os resultados no Brasil, em São Paulo e por região.</p>
+            <p class="description">Acompanhe os resultados no Brasil, por estado, capital e região.</p>
         </div>
         <div class="refresh-controls">
             <p class="countdown">Próxima atualização em <span id="contador">10</span>s</p>
+            <label class="state-selector" for="uf-selecionada">
+                UF
+                <select id="uf-selecionada" onchange="alteraUfSelecionada()" disabled>
+                    <option value="sp">Carregando...</option>
+                </select>
+            </label>
             <button id="alternar-layout" type="button" aria-pressed="false" onclick="alternarVisualizacaoHtml()">Ver versão só HTML</button>
             <button type="button" onclick="reloadAll()">Atualizar</button>
         </div>
@@ -314,19 +366,19 @@
                         <ul id="apuracao"></ul>
                     </td>
                     <td>
-                        <h2>São Paulo (SP) <span aria-hidden="true">·</span> Presidente</h2>
+                        <h2><span id="titulo-uf-presidente">São Paulo (SP)</span> <span aria-hidden="true">·</span> Presidente</h2>
                         <p id="titulo-sp-p"></p>
                         <ul id="apuracao-sp-p"></ul>
                     </td>
                 </tr>
                 <tr>
                     <td>
-                        <h2>São Paulo (SP) <span aria-hidden="true">·</span> Governador</h2>
+                        <h2><span id="titulo-uf-governador">São Paulo (SP)</span> <span aria-hidden="true">·</span> Governador</h2>
                         <p id="titulo-sp-g"></p>
                         <ul id="apuracao-sp-g"></ul>
                     </td>
                     <td>
-                        <h2>São Paulo (SP) <span aria-hidden="true">·</span> Senador</h2>
+                        <h2><span id="titulo-uf-senador">São Paulo (SP)</span> <span aria-hidden="true">·</span> Senador</h2>
                         <p id="titulo-sp-s"></p>
                         <ul id="apuracao-sp-s"></ul>
                     </td>
@@ -359,13 +411,13 @@
 
         <section class="section" aria-labelledby="cidade-heading">
             <div class="section-heading">
-                <h2 id="cidade-heading">Cidade de São Paulo</h2>
+                <h2 id="cidade-heading">Capital de São Paulo</h2>
                 <p>Votação para presidente e governador na capital.</p>
             </div>
             <table class="data-table capital-table" border="1" cellpadding="8" cellspacing="0">
                 <tr>
-                    <th>Presidente</th>
-                    <th>Governador</th>
+                    <th><span id="titulo-capital-presidente">Presidente</span></th>
+                    <th><span id="titulo-capital-governador">Governador</span></th>
                 </tr>
                 <tr>
                     <td>
@@ -379,11 +431,41 @@
                 </tr>
             </table>
         </section>
+
+        <section class="section" aria-labelledby="deputados-heading">
+            <div class="section-heading">
+                <h2 id="deputados-heading">Deputados mais votados · <span id="titulo-uf-deputados">SP</span></h2>
+                <p>Dez primeiros por quantidade de votos na UF selecionada.</p>
+            </div>
+            <table class="data-table deputies-table" border="1" cellpadding="8" cellspacing="0">
+                <thead>
+                    <tr>
+                        <th colspan="3">Deputado federal</th>
+                        <th colspan="3">Deputado estadual</th>
+                    </tr>
+                    <tr>
+                        <th>#</th>
+                        <th>Candidato</th>
+                        <th>Votos</th>
+                        <th>#</th>
+                        <th>Candidato</th>
+                        <th>Votos</th>
+                    </tr>
+                </thead>
+                <tbody id="apuracao-deputados">
+                    <tr><td colspan="6">Selecione uma UF para carregar os resultados.</td></tr>
+                </tbody>
+            </table>
+        </section>
     </main>
 
     <script>
         let timeLeft = 10;
         let visualizacaoHtmlAtiva = false;
+        let configuracaoMunicipios = null;
+        let ufSelecionada = "sp";
+        let capitalSelecionada = null;
+        let geracaoSelecao = 0;
         const regioes = {
             norte: ["AC", "AM", "AP", "PA", "RO", "RR", "TO"],
             nordeste: ["AL", "BA", "CE", "MA", "PB", "PE", "PI", "RN", "SE"],
@@ -400,12 +482,254 @@
             botao.innerText = visualizacaoHtmlAtiva ? "Voltar ao painel estilizado" : "Ver versão só HTML";
         }
 
+        function carregaConfiguracaoUfs() {
+            const url = "https://resultados.tse.jus.br/oficial/ele2026/6259/config/mun-e006259-cm.json";
+            const xhttp = new XMLHttpRequest();
+            xhttp.onload = function () {
+                if (this.status < 200 || this.status >= 300) {
+                    exibeErroConfiguracaoUfs(url, this.status);
+                    return;
+                }
+
+                try {
+                    const dados = JSON.parse(this.responseText);
+                    configuracaoMunicipios = (dados.abr || []).filter(function (estado) {
+                        return estado.cd && estado.cd.toLowerCase() !== "zz" && estado.ds && Array.isArray(estado.mu);
+                    });
+                    if (!configuracaoMunicipios.length) {
+                        throw new Error("A configuração do TSE não contém unidades federativas.");
+                    }
+
+                    const selecao = document.getElementById("uf-selecionada");
+                    selecao.innerHTML = "";
+                    configuracaoMunicipios
+                        .slice()
+                        .sort(function (a, b) {
+                            return a.ds.localeCompare(b.ds, "pt-BR");
+                        })
+                        .forEach(function (estado) {
+                            const opcao = document.createElement("option");
+                            opcao.value = estado.cd.toLowerCase();
+                            opcao.appendChild(document.createTextNode(estado.ds + " (" + estado.cd.toUpperCase() + ")"));
+                            selecao.appendChild(opcao);
+                        });
+
+                    selecao.disabled = false;
+                    selecao.value = configuracaoMunicipios.some(function (estado) {
+                        return estado.cd.toLowerCase() === ufSelecionada;
+                    }) ? ufSelecionada : configuracaoMunicipios[0].cd.toLowerCase();
+                    alteraUfSelecionada();
+                } catch (error) {
+                    exibeErroConfiguracaoUfs(url, error);
+                }
+            };
+            xhttp.onerror = function () {
+                exibeErroConfiguracaoUfs(url, "erro de rede");
+            };
+            xhttp.open("GET", url);
+            xhttp.send();
+        }
+
+        function exibeErroConfiguracaoUfs(url, erro) {
+            const selecao = document.getElementById("uf-selecionada");
+            selecao.innerHTML = "";
+            const opcao = document.createElement("option");
+            opcao.value = "";
+            opcao.appendChild(document.createTextNode("Indisponível"));
+            selecao.appendChild(opcao);
+            selecao.disabled = true;
+            ["titulo-sp-p", "titulo-sp-g", "titulo-sp-s", "titulo-sp-p-municipio", "titulo-sp-g-municipio"].forEach(function (id) {
+                document.getElementById(id).innerText = "Não foi possível carregar a lista de UFs.";
+            });
+            console.error("Falha ao carregar configuração de UFs:", url, erro);
+        }
+
+        function alteraUfSelecionada() {
+            if (!configuracaoMunicipios) {
+                return;
+            }
+
+            const selecao = document.getElementById("uf-selecionada");
+            ufSelecionada = selecao.value;
+            const estado = configuracaoMunicipios.find(function (item) {
+                return item.cd.toLowerCase() === ufSelecionada;
+            });
+            if (!estado) {
+                return;
+            }
+
+            capitalSelecionada = (estado.mu || []).find(function (municipio) {
+                return municipio.c === "s";
+            });
+            if (!capitalSelecionada) {
+                const erro = new Error("A capital da UF " + ufSelecionada.toUpperCase() + " não consta na configuração do TSE.");
+                exibeErroConfiguracaoUfs("mun-e006259-cm.json", erro);
+                return;
+            }
+
+            geracaoSelecao++;
+            const nomeUf = estado.ds + " (" + ufSelecionada.toUpperCase() + ")";
+            ["titulo-uf-presidente", "titulo-uf-governador", "titulo-uf-senador"].forEach(function (id) {
+                document.getElementById(id).innerText = nomeUf;
+            });
+            const nomeCapital = capitalSelecionada.nm + " (" + ufSelecionada.toUpperCase() + ")";
+            document.getElementById("cidade-heading").innerText = "Capital de " + estado.ds;
+            document.getElementById("titulo-capital-presidente").innerText = "Presidente · " + nomeCapital;
+            document.getElementById("titulo-capital-governador").innerText = "Governador · " + nomeCapital;
+            document.getElementById("titulo-uf-deputados").innerText = nomeUf;
+            reloadApuracaoSelecionada();
+        }
+
+        function reloadApuracaoSelecionada() {
+            if (!capitalSelecionada) {
+                return;
+            }
+
+            const uf = ufSelecionada;
+            const municipio = uf + capitalSelecionada.cd;
+            const eleicaoFederal = "e006257";
+            const eleicaoEstadual = "e006259";
+            const geracao = geracaoSelecao;
+
+            carregaApuracao(
+                "https://resultados.tse.jus.br/oficial/ele2026/6257/dados/" + uf + "/" + uf + "-c0001-" + eleicaoFederal + "-u.json",
+                "titulo-sp-p", "apuracao-sp-p", geracao
+            );
+            carregaApuracao(
+                "https://resultados.tse.jus.br/oficial/ele2026/6259/dados/" + uf + "/" + uf + "-c0003-" + eleicaoEstadual + "-u.json",
+                "titulo-sp-g", "apuracao-sp-g", geracao
+            );
+            carregaApuracao(
+                "https://resultados.tse.jus.br/oficial/ele2026/6259/dados/" + uf + "/" + uf + "-c0005-" + eleicaoEstadual + "-u.json",
+                "titulo-sp-s", "apuracao-sp-s", geracao
+            );
+            carregaApuracao(
+                "https://resultados.tse.jus.br/oficial/ele2026/6257/dados/" + uf + "/" + municipio + "-c0001-" + eleicaoFederal + "-u.json",
+                "titulo-sp-p-municipio", "apuracao-sp-p-municipio", geracao
+            );
+            carregaApuracao(
+                "https://resultados.tse.jus.br/oficial/ele2026/6259/dados/" + uf + "/" + municipio + "-c0003-" + eleicaoEstadual + "-u.json",
+                "titulo-sp-g-municipio", "apuracao-sp-g-municipio", geracao
+            );
+            carregaTopDezDeputados(uf, geracao);
+        }
+
+        function carregaTopDezDeputados(uf, geracao) {
+            const urlFederal = "https://resultados.tse.jus.br/oficial/ele2026/6259/dados/" + uf + "/" + uf + "-c0006-e006259-u.json";
+            const urlEstadual = "https://resultados.tse.jus.br/oficial/ele2026/6259/dados/" + uf + "/" + uf + "-c0007-e006259-u.json";
+            let candidatosFederais = null;
+            let candidatosEstaduais = null;
+            let erro = null;
+
+            function atualizaTabela() {
+                if (geracao !== geracaoSelecao) {
+                    return;
+                }
+                if (erro) {
+                    exibeErroTopDezDeputados(erro);
+                } else if (candidatosFederais && candidatosEstaduais) {
+                    renderizaTopDezDeputados(candidatosFederais, candidatosEstaduais);
+                }
+            }
+
+            function carregaCandidatos(url, aoCarregar) {
+                const xhttp = new XMLHttpRequest();
+                xhttp.onload = function () {
+                    if (geracao !== geracaoSelecao) {
+                        return;
+                    }
+                    if (this.status < 200 || this.status >= 300) {
+                        erro = "HTTP " + this.status;
+                        atualizaTabela();
+                        console.error("Falha ao carregar apuração de deputados:", url, this.status);
+                        return;
+                    }
+
+                    try {
+                        const dados = JSON.parse(this.responseText);
+                        const candidatos = [];
+                        (dados.carg || []).forEach(function (cargo) {
+                            (cargo.agr || []).forEach(function (grupo) {
+                                (grupo.par || []).forEach(function (partido) {
+                                    (partido.cand || []).forEach(function (candidato) {
+                                        candidatos.push(candidato);
+                                    });
+                                });
+                            });
+                        });
+                        candidatos.sort(function (a, b) {
+                            return (Number(b.vap) || 0) - (Number(a.vap) || 0);
+                        });
+                        aoCarregar(candidatos.slice(0, 10));
+                        atualizaTabela();
+                    } catch (error) {
+                        erro = error;
+                        atualizaTabela();
+                        console.error("Resposta inválida na apuração de deputados:", url, error);
+                    }
+                };
+                xhttp.onerror = function () {
+                    if (geracao !== geracaoSelecao) {
+                        return;
+                    }
+                    erro = "erro de rede";
+                    atualizaTabela();
+                    console.error("Erro de rede na apuração de deputados:", url);
+                };
+                xhttp.open("GET", url);
+                xhttp.send();
+            }
+
+            carregaCandidatos(urlFederal, function (candidatos) {
+                candidatosFederais = candidatos;
+            });
+            carregaCandidatos(urlEstadual, function (candidatos) {
+                candidatosEstaduais = candidatos;
+            });
+        }
+
+        function renderizaTopDezDeputados(federais, estaduais) {
+            const tabela = document.getElementById("apuracao-deputados");
+            tabela.innerHTML = "";
+
+            for (let index = 0; index < 10; index++) {
+                const linha = document.createElement("tr");
+                [federais[index], estaduais[index]].forEach(function (candidato, cargoIndex) {
+                    const posicao = document.createElement("td");
+                    posicao.appendChild(document.createTextNode(candidato ? String(index + 1) : "—"));
+                    const nome = document.createElement("td");
+                    nome.appendChild(document.createTextNode(candidato ? candidato.nm : "—"));
+                    const votos = document.createElement("td");
+                    votos.appendChild(document.createTextNode(
+                        candidato ? Number(candidato.vap || 0).toLocaleString("pt-BR") : "—"
+                    ));
+                    linha.appendChild(posicao);
+                    linha.appendChild(nome);
+                    linha.appendChild(votos);
+                });
+                tabela.appendChild(linha);
+            }
+        }
+
+        function exibeErroTopDezDeputados(erro) {
+            const tabela = document.getElementById("apuracao-deputados");
+            tabela.innerHTML = "";
+            const linha = document.createElement("tr");
+            const celula = document.createElement("td");
+            celula.colSpan = 6;
+            celula.appendChild(document.createTextNode("Não foi possível carregar os resultados de deputados (" + erro + ")."));
+            linha.appendChild(celula);
+            tabela.appendChild(linha);
+        }
+
         function trataApuracaoGenerica(jsonApuracao, tituloId, apuracaoId) {
             const titulo = document.getElementById(tituloId);
             const apuracao = document.getElementById(apuracaoId);
             apuracao.innerHTML = "";
 
-            const abrangencia = jsonApuracao.tpabr === "mu" ? " das urnas apuradas em São Paulo" : " das urnas apuradas";
+            const abrangencia = jsonApuracao.tpabr === "mu"
+                ? " das urnas apuradas em " + (capitalSelecionada ? capitalSelecionada.nm : "na capital")
+                : " das urnas apuradas";
             titulo.innerHTML = (jsonApuracao.s && jsonApuracao.s.pst ? jsonApuracao.s.pst : "0") + "%" + abrangencia;
 
             const candidatos = [];
@@ -444,7 +768,7 @@
             });
         }
 
-        function carregaApuracao(url, tituloId, apuracaoId) {
+        function carregaApuracao(url, tituloId, apuracaoId, geracao) {
             const xhttp = new XMLHttpRequest();
             const cargo = {
                 "titulo-sp-g": "Governador",
@@ -453,6 +777,9 @@
                 "titulo-sp-p-municipio": "Presidente"
             }[tituloId];
             const exibeErro = function (status) {
+                if (geracao !== undefined && geracao !== geracaoSelecao) {
+                    return;
+                }
                 const detalhe = cargo && status === 404
                     ? "Dados de " + cargo + " ainda não disponíveis no TSE (HTTP 404)."
                     : "Não foi possível carregar a apuração.";
@@ -460,6 +787,9 @@
                 document.getElementById(apuracaoId).innerHTML = "";
             };
             xhttp.onload = function () {
+                if (geracao !== undefined && geracao !== geracaoSelecao) {
+                    return;
+                }
                 if (this.status < 200 || this.status >= 300) {
                     exibeErro(this.status);
                     console.error("Falha ao carregar apuração:", url, this.status);
@@ -474,6 +804,9 @@
                 }
             };
             xhttp.onerror = function () {
+                if (geracao !== undefined && geracao !== geracaoSelecao) {
+                    return;
+                }
                 exibeErro();
                 console.error("Erro de rede ao carregar apuração:", url);
             };
@@ -483,26 +816,6 @@
 
         function reloadApuracaoBr() {
             carregaApuracao("https://resultados.tse.jus.br/oficial/ele2026/6257/dados/br/br-c0001-e006257-u.json", "titulo", "apuracao");
-        }
-
-        function reloadApuracaoSpPresidente() {
-            carregaApuracao("https://resultados.tse.jus.br/oficial/ele2026/6257/dados/sp/sp-c0001-e006257-u.json", "titulo-sp-p", "apuracao-sp-p");
-        }
-
-        function reloadApuracaoSpGovernador() {
-            carregaApuracao("https://resultados.tse.jus.br/oficial/ele2026/6259/dados/sp/sp-c0003-e006259-u.json", "titulo-sp-g", "apuracao-sp-g");
-        }
-
-        function reloadApuracaoSpSenador() {
-            carregaApuracao("https://resultados.tse.jus.br/oficial/ele2026/6259/dados/sp/sp-c0005-e006259-u.json", "titulo-sp-s", "apuracao-sp-s");
-        }
-
-        function reloadApuracaoCidadeSpPresidente() {
-            carregaApuracao("https://resultados.tse.jus.br/oficial/ele2026/6257/dados/sp/sp71072-c0001-e006257-u.json", "titulo-sp-p-municipio", "apuracao-sp-p-municipio");
-        }
-
-        function reloadApuracaoCidadeSpGovernador() {
-            carregaApuracao("https://resultados.tse.jus.br/oficial/ele2026/6259/dados/sp/sp71072-c0003-e006259-u.json", "titulo-sp-g-municipio", "apuracao-sp-g-municipio");
         }
 
         function reloadApuracaoUfs() {
@@ -567,17 +880,14 @@
 
         function reloadAll() {
             reloadApuracaoBr();
-            reloadApuracaoSpPresidente();
-            reloadApuracaoSpGovernador();
-            reloadApuracaoSpSenador();
             reloadApuracaoUfs();
-            reloadApuracaoCidadeSpPresidente();
-            reloadApuracaoCidadeSpGovernador();
+            reloadApuracaoSelecionada();
             timeLeft = 10;
         }
 
         // Carrega inicialmente
         reloadAll();
+        carregaConfiguracaoUfs();
 
         // Timer de contagem regressiva a cada 1 segundo
         setInterval(function () {
