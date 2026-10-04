@@ -17,17 +17,37 @@
 
             titulo.innerHTML = jsonApuracao.s.pst + "% das urnas apuradas";
 
+            const candidatos = [];
             jsonApuracao.carg[0].agr.forEach(function (grupo) {
                 grupo.par.forEach(function (partido) {
                     partido.cand.forEach(function (candidato) {
-                        const node = document.createElement("li");
-                        const textnode = document.createTextNode(
-                            candidato.nm + ": " + candidato.pvap + "%"
-                        );
-                        node.appendChild(textnode);
-                        apuracao.appendChild(node);
+                        candidatos.push(candidato);
                     });
                 });
+            });
+
+            candidatos.sort(function (a, b) {
+                const pvapA = parseFloat(String(a.pvap).replace(',', '.')) || 0;
+                const pvapB = parseFloat(String(b.pvap).replace(',', '.')) || 0;
+                return pvapB - pvapA;
+            });
+
+            candidatos.forEach(function (candidato, index) {
+                const node = document.createElement("li");
+                const textnode = document.createTextNode(
+                    candidato.nm + ": " + candidato.pvap + "%"
+                );
+                node.appendChild(textnode);
+
+                if (index < 2) {
+                    node.style.color = "green";
+                } else if (index >= candidatos.length - 2) {
+                    node.style.color = "red";
+                } else {
+                    node.style.color = "black";
+                }
+
+                apuracao.appendChild(node);
             });
         }
 
