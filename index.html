@@ -652,6 +652,7 @@
                             (cargo.agr || []).forEach(function (grupo) {
                                 (grupo.par || []).forEach(function (partido) {
                                     (partido.cand || []).forEach(function (candidato) {
+                                        candidato.sgPartido = partido.sg;
                                         candidatos.push(candidato);
                                     });
                                 });
@@ -698,7 +699,9 @@
                     const posicao = document.createElement("td");
                     posicao.appendChild(document.createTextNode(candidato ? String(index + 1) : "—"));
                     const nome = document.createElement("td");
-                    nome.appendChild(document.createTextNode(candidato ? candidato.nm : "—"));
+                    nome.appendChild(document.createTextNode(
+                        candidato ? candidato.nm + (candidato.sgPartido ? " (" + candidato.sgPartido + ")" : "") : "—"
+                    ));
                     const votos = document.createElement("td");
                     votos.appendChild(document.createTextNode(
                         candidato ? Number(candidato.vap || 0).toLocaleString("pt-BR") : "—"
