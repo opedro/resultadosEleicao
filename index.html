@@ -34,8 +34,33 @@
         </tr>
     </table>
 
+    <h2>Apuração por região</h2>
+    <table border="1" cellpadding="8" cellspacing="0" width="100%">
+        <tr>
+            <th>Norte</th>
+            <th>Nordeste</th>
+            <th>Centro-Oeste</th>
+            <th>Sudeste</th>
+            <th>Sul</th>
+        </tr>
+        <tr valign="top">
+            <td><ul id="apuracao-norte"></ul></td>
+            <td><ul id="apuracao-nordeste"></ul></td>
+            <td><ul id="apuracao-centro-oeste"></ul></td>
+            <td><ul id="apuracao-sudeste"></ul></td>
+            <td><ul id="apuracao-sul"></ul></td>
+        </tr>
+    </table>
+
     <script>
         let timeLeft = 10;
+        const regioes = {
+            norte: ["AC", "AM", "AP", "PA", "RO", "RR", "TO"],
+            nordeste: ["AL", "BA", "CE", "MA", "PB", "PE", "PI", "RN", "SE"],
+            "centro-oeste": ["DF", "GO", "MS", "MT"],
+            sudeste: ["ES", "MG", "RJ", "SP"],
+            sul: ["PR", "RS", "SC"]
+        };
 
         function trataApuracaoGenerica(jsonApuracao, tituloId, apuracaoId) {
             const titulo = document.getElementById(tituloId);
@@ -64,7 +89,7 @@
             candidatos.forEach(function (candidato, index) {
                 const node = document.createElement("li");
                 const textnode = document.createTextNode(
-                    candidato.nm + ": " + candidato.pvap + "%"
+                    candidato.nm + ": (" + Number(candidato.vap || 0).toLocaleString("pt-BR") + ") " + candidato.pvap + "%"
                 );
                 node.appendChild(textnode);
 
@@ -131,11 +156,72 @@
             carregaApuracao("https://resultados.tse.jus.br/oficial/ele2026/6259/dados/sp/sp-c0005-e006259-u.json", "titulo-sp-s", "apuracao-sp-s");
         }
 
+        function reloadApuracaoUfs() {
+            const url = "https://resultados.tse.jus.br/oficial/ele2026/6257/dados/br/br-e006257-ab.json";
+            const xhttp = new XMLHttpRequest();
+            xhttp.onload = function () {
+                if (this.status < 200 || this.status >= 300) {
+                    exibeErroApuracaoUfs(url, this.status);
+                    return;
+                }
+
+                try {
+                    const dados = JSON.parse(this.responseText);
+                    const porUf = {};
+                    (dados.abr || []).forEach(function (abrangencia) {
+                        if (abrangencia.tpabr === "uf") {
+                            porUf[abrangencia.cdabr.toUpperCase()] = abrangencia.s && abrangencia.s.pst
+                                ? abrangencia.s.pst
+                                : "0";
+                        }
+                    });
+
+                    Object.keys(regioes).forEach(function (regiao) {
+                        const lista = document.getElementById("apuracao-" + regiao);
+                        lista.innerHTML = "";
+                        regioes[regiao].forEach(function (uf) {
+                            const item = document.createElement("li");
+                            const percentual = porUf[uf] || "0";
+                            item.appendChild(document.createTextNode(uf + ": " + percentual + "%"));
+
+                            const valorPercentual = parseFloat(String(percentual).replace(",", ".")) || 0;
+                            if (valorPercentual >= 100) {
+                                item.style.color = "green";
+                            } else if (valorPercentual < 25) {
+                                item.style.color = "red";
+                            }
+
+                            lista.appendChild(item);
+                        });
+                    });
+                } catch (error) {
+                    exibeErroApuracaoUfs(url, error);
+                }
+            };
+            xhttp.onerror = function () {
+                exibeErroApuracaoUfs(url, "erro de rede");
+            };
+            xhttp.open("GET", url);
+            xhttp.send();
+        }
+
+        function exibeErroApuracaoUfs(url, erro) {
+            Object.keys(regioes).forEach(function (regiao) {
+                const lista = document.getElementById("apuracao-" + regiao);
+                lista.innerHTML = "";
+                const item = document.createElement("li");
+                item.appendChild(document.createTextNode("Não foi possível carregar a apuração."));
+                lista.appendChild(item);
+            });
+            console.error("Falha ao carregar apuração por UF:", url, erro);
+        }
+
         function reloadAll() {
             reloadApuracaoBr();
             reloadApuracaoSpPresidente();
             reloadApuracaoSpGovernador();
             reloadApuracaoSpSenador();
+            reloadApuracaoUfs();
             timeLeft = 10;
         }
 
