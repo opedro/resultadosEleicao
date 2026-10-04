@@ -1,77 +1,389 @@
 <!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Apuração eleitoral</title>
+    <style id="estilos-painel">
+        :root {
+            color-scheme: light;
+            font-family: "Segoe UI", Arial, sans-serif;
+            color: #172033;
+            background: #f2f5fa;
+        }
 
-<html>
+        * {
+            box-sizing: border-box;
+        }
 
+        body {
+            max-width: 1440px;
+            margin: 0 auto;
+            padding: 32px clamp(16px, 4vw, 56px) 56px;
+        }
+
+        .page-header {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            gap: 24px;
+            margin-bottom: 30px;
+            padding: 28px 32px;
+            color: #fff;
+            background: linear-gradient(120deg, #102a56, #165b83);
+            border-radius: 18px;
+            box-shadow: 0 12px 30px rgba(16, 42, 86, 0.16);
+        }
+
+        .eyebrow {
+            margin: 0 0 8px;
+            color: #a9d9e9;
+            font-size: 0.78rem;
+            font-weight: 700;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+        }
+
+        h1, h2, h3, p {
+            margin-top: 0;
+        }
+
+        .page-header h1 {
+            margin-bottom: 8px;
+            font-size: clamp(1.8rem, 4vw, 2.6rem);
+            line-height: 1.1;
+        }
+
+        .page-header .description {
+            margin-bottom: 0;
+            color: #d8e7f3;
+        }
+
+        .refresh-controls {
+            display: flex;
+            flex: 0 0 auto;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .countdown {
+            margin: 0;
+            color: #e4eef8;
+            font-size: 0.9rem;
+            white-space: nowrap;
+        }
+
+        #contador {
+            color: #fff;
+            font-size: 1.1rem;
+            font-weight: 700;
+            font-variant-numeric: tabular-nums;
+        }
+
+        button {
+            padding: 11px 17px;
+            color: #123252;
+            background: #fff;
+            border: 0;
+            border-radius: 10px;
+            font: inherit;
+            font-weight: 700;
+            cursor: pointer;
+            transition: transform 150ms ease, background 150ms ease;
+        }
+
+        button:hover {
+            background: #e8f4fa;
+            transform: translateY(-1px);
+        }
+
+        button:focus-visible {
+            outline: 3px solid #90dcf5;
+            outline-offset: 3px;
+        }
+
+        .section {
+            margin-top: 34px;
+        }
+
+        .section-heading {
+            margin-bottom: 16px;
+        }
+
+        .section-heading h2 {
+            margin-bottom: 5px;
+            color: #182b49;
+            font-size: 1.45rem;
+        }
+
+        .section-heading p {
+            margin-bottom: 0;
+            color: #64748b;
+        }
+
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 18px;
+        }
+
+        .data-table {
+            width: 100%;
+            border-spacing: 10px;
+            table-layout: fixed;
+            border: 0;
+        }
+
+        .results-table td, .capital-table td, .regions-table th, .regions-table td {
+            padding: 12px;
+            vertical-align: top;
+            background: #fff;
+            border: 0;
+            border-radius: 10px;
+            box-shadow: 0 3px 10px rgba(25, 45, 75, 0.045);
+        }
+
+        .results-table h2 {
+            margin: 0 0 4px;
+            color: #18345a;
+            font-size: 0.95rem;
+        }
+
+        .results-table p, .capital-table p {
+            margin: 0 0 8px;
+            color: #53657d;
+            font-size: 0.78rem;
+        }
+
+        .data-table ul {
+            margin: 0;
+            padding-left: 18px;
+        }
+
+        .results-table li, .capital-table li {
+            padding: 4px 0;
+            border-bottom: 1px solid #edf1f6;
+            line-height: 1.3;
+            overflow-wrap: anywhere;
+        }
+
+        .regions-table th {
+            padding: 8px;
+            color: #18345a;
+            background: #e8eef6;
+            border: 0;
+        }
+
+        .regions-table ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .regions-table li {
+            padding: 4px 0;
+            border-bottom: 1px solid #edf1f6;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .result-card, .region-card {
+            min-width: 0;
+            padding: 22px 24px;
+            background: #fff;
+            border: 1px solid #e2e8f0;
+            border-radius: 14px;
+            box-shadow: 0 5px 18px rgba(25, 45, 75, 0.055);
+        }
+
+        .result-card h2, .region-card h3 {
+            margin-bottom: 8px;
+            color: #18345a;
+            font-size: 1.08rem;
+        }
+
+        .result-card > p {
+            min-height: 1.4em;
+            margin-bottom: 14px;
+            color: #53657d;
+            font-size: 0.9rem;
+        }
+
+        .result-card ul, .region-card ul {
+            margin: 0;
+            padding-left: 20px;
+        }
+
+        .result-card li {
+            padding: 6px 0;
+            border-bottom: 1px solid #edf1f6;
+            line-height: 1.4;
+        }
+
+        .result-card li:last-child, .region-card li:last-child {
+            border-bottom: 0;
+        }
+
+        .region-grid {
+            display: grid;
+            grid-template-columns: repeat(5, minmax(0, 1fr));
+            gap: 14px;
+        }
+
+        .region-card {
+            padding: 18px;
+        }
+
+        .region-card h3 {
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e5edf5;
+        }
+
+        .region-card ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .region-card li {
+            padding: 6px 0;
+            border-bottom: 1px solid #edf1f6;
+            font-variant-numeric: tabular-nums;
+        }
+
+        @media (max-width: 1000px) {
+            .region-grid {
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+            }
+        }
+
+        @media (max-width: 700px) {
+            body {
+                padding: 16px 14px 36px;
+            }
+
+            .page-header {
+                align-items: flex-start;
+                flex-direction: column;
+                padding: 23px;
+            }
+
+            .refresh-controls {
+                width: 100%;
+                justify-content: space-between;
+            }
+
+            .results-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .region-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+
+        @media (max-width: 420px) {
+            .region-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .result-card {
+                padding: 19px;
+            }
+        }
+    </style>
+</head>
 <body>
+    <header class="page-header">
+        <div>
+            <p class="eyebrow">Eleições 2026 · resultados em tempo real</p>
+            <h1>Painel de apuração</h1>
+            <p class="description">Acompanhe os resultados no Brasil, em São Paulo e por região.</p>
+        </div>
+        <div class="refresh-controls">
+            <p class="countdown">Próxima atualização em <span id="contador">10</span>s</p>
+            <button id="alternar-layout" type="button" aria-pressed="false" onclick="alternarVisualizacaoHtml()">Ver versão só HTML</button>
+            <button type="button" onclick="reloadAll()">Atualizar</button>
+        </div>
+    </header>
 
-    <p>Próxima atualização em: <span id="contador">10</span>s</p>
-    <button type="button" onclick="reloadAll()">Reload</button>
+    <main>
+        <section class="section" aria-label="Apuração por cargo">
+            <table class="data-table results-table" border="1" cellpadding="8" cellspacing="0">
+                <tr>
+                    <td>
+                        <h2>Brasil <span aria-hidden="true">·</span> Presidente</h2>
+                        <p id="titulo"></p>
+                        <ul id="apuracao"></ul>
+                    </td>
+                    <td>
+                        <h2>São Paulo (SP) <span aria-hidden="true">·</span> Presidente</h2>
+                        <p id="titulo-sp-p"></p>
+                        <ul id="apuracao-sp-p"></ul>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <h2>São Paulo (SP) <span aria-hidden="true">·</span> Governador</h2>
+                        <p id="titulo-sp-g"></p>
+                        <ul id="apuracao-sp-g"></ul>
+                    </td>
+                    <td>
+                        <h2>São Paulo (SP) <span aria-hidden="true">·</span> Senador</h2>
+                        <p id="titulo-sp-s"></p>
+                        <ul id="apuracao-sp-s"></ul>
+                    </td>
+                </tr>
+            </table>
+        </section>
 
-    <table border="1" cellpadding="8" cellspacing="0" width="100%">
-        <tr>
-            <td valign="top">
-                <h2>Brasil - Presidente</h2>
-                <p id="titulo"></p>
-                <ul id="apuracao"></ul>
-            </td>
-            <td valign="top">
-                <h2>São Paulo (SP) - Presidente</h2>
-                <p id="titulo-sp-p"></p>
-                <ul id="apuracao-sp-p"></ul>
-            </td>
-        </tr>
-        <tr>
-            <td valign="top">
-                <h2>São Paulo (SP) - Governador</h2>
-                <p id="titulo-sp-g"></p>
-                <ul id="apuracao-sp-g"></ul>
-            </td>
-            <td valign="top">
-                <h2>São Paulo (SP) - Senador</h2>
-                <p id="titulo-sp-s"></p>
-                <ul id="apuracao-sp-s"></ul>
-            </td>
-        </tr>
-    </table>
+        <section class="section" aria-labelledby="regioes-heading">
+            <div class="section-heading">
+                <h2 id="regioes-heading">Apuração por região</h2>
+                <p>Percentual de urnas apuradas em cada unidade federativa.</p>
+            </div>
+            <table class="data-table regions-table" border="1" cellpadding="8" cellspacing="0">
+                <tr>
+                    <th>Norte</th>
+                    <th>Nordeste</th>
+                    <th>Centro-Oeste</th>
+                    <th>Sudeste</th>
+                    <th>Sul</th>
+                </tr>
+                <tr>
+                    <td><ul id="apuracao-norte"></ul></td>
+                    <td><ul id="apuracao-nordeste"></ul></td>
+                    <td><ul id="apuracao-centro-oeste"></ul></td>
+                    <td><ul id="apuracao-sudeste"></ul></td>
+                    <td><ul id="apuracao-sul"></ul></td>
+                </tr>
+            </table>
+        </section>
 
-    <h2>Apuração por região</h2>
-    <table border="1" cellpadding="8" cellspacing="0" width="100%">
-        <tr>
-            <th>Norte</th>
-            <th>Nordeste</th>
-            <th>Centro-Oeste</th>
-            <th>Sudeste</th>
-            <th>Sul</th>
-        </tr>
-        <tr valign="top">
-            <td><ul id="apuracao-norte"></ul></td>
-            <td><ul id="apuracao-nordeste"></ul></td>
-            <td><ul id="apuracao-centro-oeste"></ul></td>
-            <td><ul id="apuracao-sudeste"></ul></td>
-            <td><ul id="apuracao-sul"></ul></td>
-        </tr>
-    </table>
-
-    <h2>Apuração na cidade de São Paulo</h2>
-    <table border="1" cellpadding="8" cellspacing="0" width="100%">
-        <tr>
-            <th>Presidente</th>
-            <th>Governador</th>
-        </tr>
-        <tr valign="top">
-            <td>
-                <p id="titulo-sp-p-municipio"></p>
-                <ul id="apuracao-sp-p-municipio"></ul>
-            </td>
-            <td>
-                <p id="titulo-sp-g-municipio"></p>
-                <ul id="apuracao-sp-g-municipio"></ul>
-            </td>
-        </tr>
-    </table>
+        <section class="section" aria-labelledby="cidade-heading">
+            <div class="section-heading">
+                <h2 id="cidade-heading">Cidade de São Paulo</h2>
+                <p>Votação para presidente e governador na capital.</p>
+            </div>
+            <table class="data-table capital-table" border="1" cellpadding="8" cellspacing="0">
+                <tr>
+                    <th>Presidente</th>
+                    <th>Governador</th>
+                </tr>
+                <tr>
+                    <td>
+                        <p id="titulo-sp-p-municipio"></p>
+                        <ul id="apuracao-sp-p-municipio"></ul>
+                    </td>
+                    <td>
+                        <p id="titulo-sp-g-municipio"></p>
+                        <ul id="apuracao-sp-g-municipio"></ul>
+                    </td>
+                </tr>
+            </table>
+        </section>
+    </main>
 
     <script>
         let timeLeft = 10;
+        let visualizacaoHtmlAtiva = false;
         const regioes = {
             norte: ["AC", "AM", "AP", "PA", "RO", "RR", "TO"],
             nordeste: ["AL", "BA", "CE", "MA", "PB", "PE", "PI", "RN", "SE"],
@@ -79,6 +391,14 @@
             sudeste: ["ES", "MG", "RJ", "SP"],
             sul: ["PR", "RS", "SC"]
         };
+
+        function alternarVisualizacaoHtml() {
+            visualizacaoHtmlAtiva = !visualizacaoHtmlAtiva;
+            document.getElementById("estilos-painel").sheet.disabled = visualizacaoHtmlAtiva;
+            const botao = document.getElementById("alternar-layout");
+            botao.setAttribute("aria-pressed", String(visualizacaoHtmlAtiva));
+            botao.innerText = visualizacaoHtmlAtiva ? "Voltar ao painel estilizado" : "Ver versão só HTML";
+        }
 
         function trataApuracaoGenerica(jsonApuracao, tituloId, apuracaoId) {
             const titulo = document.getElementById(tituloId);
