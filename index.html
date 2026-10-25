@@ -23,6 +23,7 @@
         }
 
         .page-header {
+            position: relative;
             display: flex;
             align-items: flex-end;
             justify-content: space-between;
@@ -64,6 +65,7 @@
             flex: 0 0 auto;
             align-items: center;
             flex-wrap: wrap;
+            padding-right: 48px;
             gap: 14px;
         }
 
@@ -101,6 +103,35 @@
         button:focus-visible {
             outline: 3px solid #90dcf5;
             outline-offset: 3px;
+        }
+
+        .refresh-icon-button {
+            position: absolute;
+            top: 14px;
+            right: 14px;
+            display: grid;
+            width: 40px;
+            height: 40px;
+            padding: 9px;
+            color: #123252;
+            background: #fff;
+            border-radius: 10px;
+        }
+
+        .refresh-icon-button svg {
+            width: 22px;
+            height: 22px;
+            fill: currentColor;
+        }
+
+        .page-footer {
+            margin-top: 28px;
+            text-align: center;
+        }
+
+        .page-footer a {
+            color: #53657d;
+            font-size: 0.85rem;
         }
 
         .state-selector {
@@ -225,8 +256,41 @@
             gap: 20px;
         }
 
+        .map-layout.comparative {
+            display: block;
+        }
+
         .map-graphic {
             min-width: 0;
+        }
+
+        .comparison-maps {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 16px;
+        }
+
+        .single-map[hidden], .comparison-maps[hidden] {
+            display: none;
+        }
+
+        .comparison-map {
+            min-width: 0;
+            padding: 12px;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+        }
+
+        .comparison-map h3 {
+            margin: 0;
+            color: #18345a;
+            text-align: center;
+        }
+
+        .comparison-map svg {
+            display: block;
+            width: 100%;
         }
 
         .map-status {
@@ -248,6 +312,11 @@
             overflow: auto;
             border: 1px solid #e2e8f0;
             border-radius: 10px;
+        }
+
+        .map-layout.comparative .map-results-table-wrap {
+            max-height: 460px;
+            margin-top: 18px;
         }
 
         .map-results-table {
@@ -281,6 +350,31 @@
         }
 
         .map-results-table th:nth-child(4), .map-results-table td:nth-child(4) {
+            color: #d93636;
+        }
+
+        .map-results-table.comparative th:nth-child(4),
+        .map-results-table.comparative td:nth-child(4),
+        .map-results-table.comparative th:nth-child(5),
+        .map-results-table.comparative td:nth-child(5),
+        .map-results-table.comparative th:nth-child(6),
+        .map-results-table.comparative td:nth-child(6) {
+            color: #216ac0;
+        }
+
+        .map-results-table.comparative th:nth-child(2),
+        .map-results-table.comparative td:nth-child(2),
+        .map-results-table.comparative th:nth-child(3),
+        .map-results-table.comparative td:nth-child(3) {
+            color: #334155;
+        }
+
+        .map-results-table.comparative th:nth-child(7),
+        .map-results-table.comparative td:nth-child(7),
+        .map-results-table.comparative th:nth-child(8),
+        .map-results-table.comparative td:nth-child(8),
+        .map-results-table.comparative th:nth-child(9),
+        .map-results-table.comparative td:nth-child(9) {
             color: #d93636;
         }
 
@@ -574,6 +668,7 @@
                 width: 100%;
                 flex-wrap: wrap;
                 justify-content: flex-start;
+                padding-right: 0;
                 gap: 8px;
             }
 
@@ -593,6 +688,10 @@
             .map-layout {
                 grid-template-columns: 1fr;
                 gap: 12px;
+            }
+
+            .comparison-maps {
+                grid-template-columns: 1fr;
             }
 
             .map-results-table-wrap {
@@ -701,6 +800,7 @@
                 <div class="round-selector-buttons">
                     <button id="turno-primeiro" type="button" aria-pressed="true" onclick="alteraTurno('primeiro')">1º</button>
                     <button id="turno-segundo" type="button" aria-pressed="false" onclick="alteraTurno('segundo')">2º</button>
+                    <button id="turno-comparativo" type="button" aria-pressed="false" onclick="alteraTurno('comparativo')">Comparativo</button>
                 </div>
             </div>
             <p class="countdown">Próxima atualização em <span id="contador">10</span>s</p>
@@ -710,10 +810,13 @@
                     <option value="sp">Carregando...</option>
                 </select>
             </label>
-            <button id="alternar-layout" type="button" aria-pressed="false" onclick="alternarVisualizacaoHtml()">Ver versão só HTML</button>
             <button id="alternar-mapa" type="button" aria-pressed="false" onclick="alternarVisualizacaoMapa()">Ver mapa</button>
-            <button type="button" onclick="reloadAll(true)">Atualizar</button>
         </div>
+        <button class="refresh-icon-button" type="button" aria-label="Atualizar resultados" title="Atualizar resultados" onclick="reloadAll(true)">
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                <path d="M17.65 6.35A7.95 7.95 0 0 0 12 4a8 8 0 1 0 7.93 9h-2.02A6 6 0 1 1 12 6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"></path>
+            </svg>
+        </button>
     </header>
 
     <main id="dashboard">
@@ -843,17 +946,17 @@
             </div>
             <div class="map-summary" aria-live="polite">
                 <article class="summary-card">
-                    <h3>Urnas apuradas</h3>
+                    <h3 id="mapa-urnas-label">Urnas apuradas</h3>
                     <strong id="mapa-urnas">Carregando...</strong>
                     <p id="mapa-urnas-percent"></p>
                 </article>
                 <article class="summary-card flavio">
-                    <h3>Flávio Bolsonaro</h3>
+                    <h3 id="mapa-flavio-label">Flávio Bolsonaro</h3>
                     <strong id="mapa-flavio-percent">Carregando...</strong>
                     <p id="mapa-flavio-votos"></p>
                 </article>
                 <article class="summary-card lula">
-                    <h3>Lula</h3>
+                    <h3 id="mapa-lula-label">Lula</h3>
                     <strong id="mapa-lula-percent">Carregando...</strong>
                     <p id="mapa-lula-votos"></p>
                 </article>
@@ -864,16 +967,32 @@
             <p id="mapa-status" class="map-status" role="status">Carregando mapa e resultados...</p>
             <div class="map-layout">
                 <div class="map-graphic">
-                    <svg id="mapa-brasil" viewBox="0 0 800 800" role="img" aria-labelledby="mapa-svg-titulo mapa-svg-descricao">
-                        <title id="mapa-svg-titulo">Mapa dos resultados presidenciais por estado</title>
-                        <desc id="mapa-svg-descricao">Estados azuis indicam mais votos para Flávio Bolsonaro; estados vermelhos indicam mais votos para Lula.</desc>
-                        <g id="mapa-estados"></g>
-                    </svg>
+                    <div id="mapa-simples" class="single-map">
+                        <svg id="mapa-brasil" viewBox="0 0 800 800" role="img" aria-labelledby="mapa-svg-titulo mapa-svg-descricao">
+                            <title id="mapa-svg-titulo">Mapa dos resultados presidenciais por estado</title>
+                            <desc id="mapa-svg-descricao">Estados azuis indicam mais votos para Flávio Bolsonaro; estados vermelhos indicam mais votos para Lula.</desc>
+                            <g id="mapa-estados"></g>
+                        </svg>
+                    </div>
+                    <div id="mapa-comparativo" class="comparison-maps" hidden>
+                        <section class="comparison-map" aria-labelledby="mapa-primeiro-heading">
+                            <h3 id="mapa-primeiro-heading">1º turno</h3>
+                            <svg id="mapa-brasil-primeiro" viewBox="0 0 800 800" role="img" aria-label="Maioria presidencial por estado no primeiro turno">
+                                <g id="mapa-estados-primeiro"></g>
+                            </svg>
+                        </section>
+                        <section class="comparison-map" aria-labelledby="mapa-segundo-heading">
+                            <h3 id="mapa-segundo-heading">2º turno</h3>
+                            <svg id="mapa-brasil-segundo" viewBox="0 0 800 800" role="img" aria-label="Maioria presidencial por estado no segundo turno">
+                                <g id="mapa-estados-segundo"></g>
+                            </svg>
+                        </section>
+                    </div>
                 </div>
                 <div class="map-results-table-wrap">
                     <table class="map-results-table">
                         <thead>
-                            <tr>
+                            <tr id="mapa-resultados-cabecalho">
                                 <th scope="col">Estado</th>
                                 <th scope="col">Urnas apuradas</th>
                                 <th scope="col">% Flávio</th>
@@ -887,13 +1006,17 @@
                 </div>
             </div>
             <div class="map-legend" aria-label="Legenda do mapa">
-                <span><span class="legend-swatch" style="background:#2879d0"></span>Mais votos para Flávio Bolsonaro</span>
-                <span><span class="legend-swatch" style="background:#d93636"></span>Mais votos para Lula</span>
-                <span><span class="legend-swatch" style="background:#cbd5e1"></span>Empate ou sem resultado disponível</span>
+                <span><span class="legend-swatch" id="legenda-mapa-flavio" style="background:#2879d0"></span><span id="legenda-texto-flavio">Mais votos para Flávio Bolsonaro</span></span>
+                <span><span class="legend-swatch" id="legenda-mapa-lula" style="background:#d93636"></span><span id="legenda-texto-lula">Mais votos para Lula</span></span>
+                <span><span class="legend-swatch" style="background:#cbd5e1"></span><span id="legenda-texto-indisponivel">Empate ou sem resultado disponível</span></span>
             </div>
             <p class="map-source">Limites estaduais: <a href="https://github.com/codeforamerica/click_that_hood" target="_blank" rel="noopener noreferrer">Click That ’Hood</a>.</p>
         </section>
     </main>
+
+    <footer class="page-footer">
+        <a id="alternar-layout" href="#" onclick="alternarVisualizacaoHtml(event)">Ver versão só HTML</a>
+    </footer>
 
     <script>
         let timeLeft = 10;
@@ -907,10 +1030,12 @@
         let mapaCarregandoGeometria = false;
         let geracaoMapa = 0;
         let mapaResultados = {};
+        let mapaResultadosPorTurno = { primeiro: {}, segundo: {} };
         let mapaResultadosCarregando = false;
         let mapaTurnoCarregando = null;
         let mapaUltimaAtualizacao = 0;
         let estadoMapaSelecionado = null;
+        let geracaoResumoMapa = 0;
         const urlGeometriaMapa = "https://raw.githubusercontent.com/codeforamerica/click_that_hood/main/public/data/brazil-states.geojson";
         const eleicoesPorTurno = {
             primeiro: {
@@ -930,27 +1055,77 @@
             sul: ["PR", "RS", "SC"]
         };
 
-        function alternarVisualizacaoHtml() {
+        function alternarVisualizacaoHtml(event) {
+            if (event) {
+                event.preventDefault();
+            }
             visualizacaoHtmlAtiva = !visualizacaoHtmlAtiva;
             document.getElementById("estilos-painel").sheet.disabled = visualizacaoHtmlAtiva;
-            const botao = document.getElementById("alternar-layout");
-            botao.setAttribute("aria-pressed", String(visualizacaoHtmlAtiva));
-            botao.innerText = visualizacaoHtmlAtiva ? "Voltar ao painel estilizado" : "Ver versão só HTML";
+            const link = document.getElementById("alternar-layout");
+            link.innerText = visualizacaoHtmlAtiva ? "Voltar ao painel estilizado" : "Ver versão só HTML";
         }
 
         function alteraTurno(turno) {
-            if (!eleicoesPorTurno[turno] || turno === turnoSelecionado) {
+            if ((turno !== "comparativo" && !eleicoesPorTurno[turno]) || turno === turnoSelecionado) {
                 return;
             }
 
             turnoSelecionado = turno;
             document.getElementById("turno-primeiro").setAttribute("aria-pressed", String(turno === "primeiro"));
             document.getElementById("turno-segundo").setAttribute("aria-pressed", String(turno === "segundo"));
+            document.getElementById("turno-comparativo").setAttribute("aria-pressed", String(turno === "comparativo"));
             geracaoSelecao++;
             geracaoMapa++;
             mapaResultadosCarregando = false;
             mapaUltimaAtualizacao = 0;
+            geracaoResumoMapa++;
+            atualizaApresentacaoModoMapa();
+            if (turno === "comparativo" && document.getElementById("mapa-view").hidden) {
+                alternarVisualizacaoMapa();
+            }
             reloadAll(true);
+        }
+
+        function turnoParaDadosDoPainel() {
+            return turnoSelecionado === "comparativo" ? "primeiro" : turnoSelecionado;
+        }
+
+        function atualizaApresentacaoModoMapa() {
+            const comparativo = turnoSelecionado === "comparativo";
+            document.getElementById("mapa-simples").hidden = comparativo;
+            document.getElementById("mapa-comparativo").hidden = !comparativo;
+            document.querySelector(".map-layout").classList.toggle("comparative", comparativo);
+            document.getElementById("resumo-mapa-heading").innerText = comparativo
+                ? "Comparativo nacional · Presidente"
+                : "Resumo nacional · Presidente";
+            document.getElementById("mapa-heading").innerText = comparativo
+                ? "Resultados presidenciais por estado e turno"
+                : "Maioria por estado";
+            document.getElementById("legenda-texto-flavio").innerText = comparativo
+                ? "Mais votos para Flávio Bolsonaro em cada mapa"
+                : "Mais votos para Flávio Bolsonaro";
+            document.getElementById("legenda-texto-lula").innerText = comparativo
+                ? "Mais votos para Lula em cada mapa"
+                : "Mais votos para Lula";
+            document.getElementById("legenda-texto-indisponivel").innerText = comparativo
+                ? "Empate ou sem resultado disponível"
+                : "Empate ou sem resultado disponível";
+            atualizaCabecalhoTabelaMapa();
+        }
+
+        function atualizaCabecalhoTabelaMapa() {
+            document.querySelector(".map-results-table").classList.toggle("comparative", turnoSelecionado === "comparativo");
+            const cabecalho = document.getElementById("mapa-resultados-cabecalho");
+            const colunas = turnoSelecionado === "comparativo"
+                ? ["Estado", "Urnas 1º", "Urnas 2º", "Flávio 1º", "Flávio 2º", "Δ Flávio", "Lula 1º", "Lula 2º", "Δ Lula"]
+                : ["Estado", "Urnas apuradas", "% Flávio", "% Lula"];
+            cabecalho.innerHTML = "";
+            colunas.forEach(function (texto) {
+                const celula = document.createElement("th");
+                celula.scope = "col";
+                celula.appendChild(document.createTextNode(texto));
+                cabecalho.appendChild(celula);
+            });
         }
 
         function alternarVisualizacaoMapa() {
@@ -1078,8 +1253,9 @@
 
             const uf = ufSelecionada;
             const municipio = uf + capitalSelecionada.cd;
-            const eleicaoFederal = eleicoesPorTurno[turnoSelecionado].presidente;
-            const eleicaoEstadual = eleicoesPorTurno[turnoSelecionado].estadual;
+            const turno = turnoParaDadosDoPainel();
+            const eleicaoFederal = eleicoesPorTurno[turno].presidente;
+            const eleicaoEstadual = eleicoesPorTurno[turno].estadual;
             const geracao = geracaoSelecao;
 
             carregaApuracao(
@@ -1090,7 +1266,7 @@
                 "https://resultados.tse.jus.br/oficial/ele2026/" + eleicaoEstadual.codigo + "/dados/" + uf + "/" + uf + "-c0003-" + eleicaoEstadual.id + "-u.json",
                 "titulo-sp-g", "apuracao-sp-g", geracao
             );
-            if (turnoSelecionado === "primeiro") {
+            if (turno === "primeiro") {
                 carregaApuracao(
                     "https://resultados.tse.jus.br/oficial/ele2026/" + eleicaoEstadual.codigo + "/dados/" + uf + "/" + uf + "-c0005-" + eleicaoEstadual.id + "-u.json",
                     "titulo-sp-s", "apuracao-sp-s", geracao
@@ -1153,7 +1329,7 @@
         }
 
         function carregaTopDezDeputados(uf, geracao) {
-            const eleicaoEstadual = eleicoesPorTurno[turnoSelecionado].estadual;
+            const eleicaoEstadual = eleicoesPorTurno[turnoParaDadosDoPainel()].estadual;
             const urlFederal = "https://resultados.tse.jus.br/oficial/ele2026/" + eleicaoEstadual.codigo + "/dados/" + uf + "/" + uf + "-c0006-" + eleicaoEstadual.id + "-u.json";
             const urlEstadual = "https://resultados.tse.jus.br/oficial/ele2026/" + eleicaoEstadual.codigo + "/dados/" + uf + "/" + uf + "-c0007-" + eleicaoEstadual.id + "-u.json";
             let candidatosFederais = null;
@@ -1276,7 +1452,9 @@
             const titulo = document.getElementById(tituloId);
             const apuracao = document.getElementById(apuracaoId);
             if (tituloId === "titulo") {
-                atualizaResumoMapa(jsonApuracao);
+                if (turnoSelecionado !== "comparativo") {
+                    atualizaResumoMapa(jsonApuracao);
+                }
             }
             apuracao.innerHTML = "";
             document.getElementById(apuracaoId + "-totais").innerText = textoTotaisVotacao(extraiTotaisVotacao(jsonApuracao));
@@ -1373,7 +1551,7 @@
         }
 
         function reloadApuracaoBr() {
-            const eleicao = eleicoesPorTurno[turnoSelecionado].presidente;
+            const eleicao = eleicoesPorTurno[turnoParaDadosDoPainel()].presidente;
             carregaApuracao("https://resultados.tse.jus.br/oficial/ele2026/" + eleicao.codigo + "/dados/br/br-c0001-" + eleicao.id + "-u.json", "titulo", "apuracao", geracaoSelecao);
         }
 
@@ -1395,6 +1573,9 @@
         }
 
         function atualizaResumoMapa(jsonApuracao) {
+            document.getElementById("mapa-urnas-label").innerText = "Urnas apuradas";
+            document.getElementById("mapa-flavio-label").innerText = "Flávio Bolsonaro";
+            document.getElementById("mapa-lula-label").innerText = "Lula";
             const secoesApuradas = jsonApuracao.s && jsonApuracao.s.si;
             const secoesTotais = jsonApuracao.s && jsonApuracao.s.ts;
             document.getElementById("resumo-mapa-turno").innerText = "Resultados do " + (turnoSelecionado === "primeiro" ? "primeiro" : "segundo") + " turno.";
@@ -1423,6 +1604,113 @@
             document.getElementById("mapa-lula-votos").innerText = lula ? formataTotalVotacao(lula.vap) + " votos" : "";
         }
 
+        function resumoPercentualUrnas(jsonApuracao) {
+            const apuradas = Number(jsonApuracao.s && jsonApuracao.s.si);
+            const total = Number(jsonApuracao.s && jsonApuracao.s.ts);
+            if (!Number.isFinite(apuradas) || !Number.isFinite(total) || total <= 0) {
+                return null;
+            }
+            return apuradas / total * 100;
+        }
+
+        function resumoCandidato(jsonApuracao, criterio) {
+            return encontraCandidatoPresidencial(jsonApuracao, criterio);
+        }
+
+        function atualizaResumoMapaComparativo(primeiro, segundo) {
+            document.getElementById("resumo-mapa-turno").innerText = "Comparação entre o primeiro e o segundo turno.";
+            document.getElementById("mapa-urnas-label").innerText = "Urnas apuradas · 1º → 2º turno";
+            document.getElementById("mapa-flavio-label").innerText = "Flávio Bolsonaro · 1º → 2º turno";
+            document.getElementById("mapa-lula-label").innerText = "Lula · 1º → 2º turno";
+
+            const percentualUrnasPrimeiro = resumoPercentualUrnas(primeiro);
+            const percentualUrnasSegundo = resumoPercentualUrnas(segundo);
+            document.getElementById("mapa-urnas").innerText = primeiro.s && segundo.s
+                ? formataTotalVotacao(primeiro.s.si) + " / " + formataTotalVotacao(primeiro.s.ts)
+                    + " → " + formataTotalVotacao(segundo.s.si) + " / " + formataTotalVotacao(segundo.s.ts)
+                : "Indisponível";
+            document.getElementById("mapa-urnas-percent").innerText = percentualUrnasPrimeiro !== null && percentualUrnasSegundo !== null
+                ? textoPercentual(percentualUrnasPrimeiro.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }))
+                    + " → " + textoPercentual(percentualUrnasSegundo.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }))
+                : "Percentual indisponível";
+
+            const criterioFlavio = function (nome) {
+                return nome.indexOf("FLAVIO") >= 0 && nome.indexOf("BOLSONARO") >= 0;
+            };
+            const criterioLula = function (nome) {
+                return nome.indexOf("LULA") >= 0;
+            };
+            const flavioPrimeiro = resumoCandidato(primeiro, criterioFlavio);
+            const flavioSegundo = resumoCandidato(segundo, criterioFlavio);
+            const lulaPrimeiro = resumoCandidato(primeiro, criterioLula);
+            const lulaSegundo = resumoCandidato(segundo, criterioLula);
+            atualizaResumoCandidatoComparativo("flavio", flavioPrimeiro, flavioSegundo);
+            atualizaResumoCandidatoComparativo("lula", lulaPrimeiro, lulaSegundo);
+        }
+
+        function atualizaResumoCandidatoComparativo(id, primeiro, segundo) {
+            const percentualPrimeiro = textoPercentualCandidato(primeiro);
+            const percentualSegundo = textoPercentualCandidato(segundo);
+            const variacao = primeiro && segundo
+                ? variacaoPercentual(segundo.pvap, primeiro.pvap)
+                : null;
+            document.getElementById("mapa-" + id + "-percent").innerText = percentualPrimeiro + " → " + percentualSegundo;
+            document.getElementById("mapa-" + id + "-votos").innerText = primeiro && segundo
+                ? "Votos: " + formataTotalVotacao(primeiro.vap) + " → " + formataTotalVotacao(segundo.vap)
+                    + " · " + formataVariacaoPercentual(variacao)
+                : "Comparação indisponível";
+        }
+
+        function carregaResumoMapaComparativo() {
+            const geracao = ++geracaoResumoMapa;
+            const primeiro = eleicoesPorTurno.primeiro.presidente;
+            const segundo = eleicoesPorTurno.segundo.presidente;
+            const eleicoes = [primeiro, segundo];
+            const resultados = [];
+            let concluidos = 0;
+            let erro = null;
+
+            eleicoes.forEach(function (eleicao, index) {
+                const url = "https://resultados.tse.jus.br/oficial/ele2026/" + eleicao.codigo + "/dados/br/br-c0001-" + eleicao.id + "-u.json";
+                const xhttp = new XMLHttpRequest();
+                function finaliza(dados, erroResposta) {
+                    if (geracao !== geracaoResumoMapa || turnoSelecionado !== "comparativo") {
+                        return;
+                    }
+                    if (erroResposta) {
+                        erro = erroResposta;
+                        console.error("Falha ao carregar resumo comparativo:", url, erroResposta);
+                    } else {
+                        resultados[index] = dados;
+                    }
+                    concluidos++;
+                    if (concluidos === eleicoes.length) {
+                        if (erro) {
+                            exibeResumoMapaIndisponivel();
+                        } else {
+                            atualizaResumoMapaComparativo(resultados[0], resultados[1]);
+                        }
+                    }
+                }
+                xhttp.onload = function () {
+                    if (this.status < 200 || this.status >= 300) {
+                        finaliza(null, "HTTP " + this.status);
+                        return;
+                    }
+                    try {
+                        finaliza(JSON.parse(this.responseText), null);
+                    } catch (error) {
+                        finaliza(null, error);
+                    }
+                };
+                xhttp.onerror = function () {
+                    finaliza(null, "erro de rede");
+                };
+                xhttp.open("GET", url);
+                xhttp.send();
+            });
+        }
+
         function textoPercentualCandidato(candidato) {
             return candidato && candidato.pvap !== undefined && candidato.pvap !== ""
                 ? candidato.pvap + "%"
@@ -1430,6 +1718,9 @@
         }
 
         function exibeResumoMapaIndisponivel() {
+            if (turnoSelecionado === "comparativo") {
+                return;
+            }
             document.getElementById("resumo-mapa-turno").innerText = "Não foi possível carregar o resumo deste turno.";
             ["mapa-urnas", "mapa-flavio-percent", "mapa-lula-percent"].forEach(function (id) {
                 document.getElementById(id).innerText = "Indisponível";
@@ -1442,6 +1733,10 @@
         function carregaGeometriaMapa() {
             if (mapaGeometria) {
                 renderizaMapaEstados();
+                if (turnoSelecionado === "comparativo") {
+                    renderizaMapaEstados("primeiro");
+                    renderizaMapaEstados("segundo");
+                }
                 carregaResultadosMapa();
                 return;
             }
@@ -1466,6 +1761,10 @@
                     }
                     mapaGeometria = dados;
                     renderizaMapaEstados();
+                    if (turnoSelecionado === "comparativo") {
+                        renderizaMapaEstados("primeiro");
+                        renderizaMapaEstados("segundo");
+                    }
                     carregaResultadosMapa(true);
                 } catch (error) {
                     exibeErroMapa("Não foi possível interpretar os limites dos estados.");
@@ -1526,8 +1825,9 @@
             return comandos.join("");
         }
 
-        function renderizaMapaEstados() {
-            const grupo = document.getElementById("mapa-estados");
+        function renderizaMapaEstados(turno) {
+            const grupo = document.getElementById(turno ? "mapa-estados-" + turno : "mapa-estados");
+            const resultados = turno ? mapaResultadosPorTurno[turno] : mapaResultados;
             grupo.innerHTML = "";
             if (!mapaGeometria) {
                 return;
@@ -1561,7 +1861,7 @@
                 caminho.setAttribute("data-uf", uf);
                 caminho.setAttribute("tabindex", "0");
                 caminho.setAttribute("role", "button");
-                caminho.setAttribute("fill", corEstadoMapa(mapaResultados[uf]));
+                caminho.setAttribute("fill", corEstadoMapa(resultados[uf]));
                 caminho.appendChild(document.createElementNS("http://www.w3.org/2000/svg", "title"));
                 grupo.appendChild(caminho);
                 caminho.addEventListener("click", function () {
@@ -1573,13 +1873,24 @@
                         destacaEstadoNaTabela(uf);
                     }
                 });
-                atualizaTituloEstadoMapa(caminho, uf);
+                atualizaTituloEstadoMapa(caminho, uf, resultados[uf]);
             });
         }
 
         function corEstadoMapa(resultado) {
             if (!resultado || resultado.vencedor === "empate") {
                 return "#cbd5e1";
+            }
+
+            if (resultado.comparativo) {
+                const intensidade = Math.min(1, Math.abs(resultado.variacaoFlavio - resultado.variacaoLula) / 10);
+                const corBase = resultado.vencedor === "flavio" ? [40, 121, 208] : [217, 54, 54];
+                const cor = corBase.map(function (canal) {
+                    return Math.round(255 - (255 - canal) * intensidade);
+                });
+                return "#" + cor.map(function (canal) {
+                    return canal.toString(16).padStart(2, "0");
+                }).join("");
             }
 
             const corBase = resultado.vencedor === "flavio" ? [40, 121, 208] : [217, 54, 54];
@@ -1593,8 +1904,7 @@
             }).join("");
         }
 
-        function atualizaTituloEstadoMapa(caminho, uf) {
-            const resultado = mapaResultados[uf];
+        function atualizaTituloEstadoMapa(caminho, uf, resultado) {
             const titulo = caminho.querySelector("title");
             if (!resultado) {
                 titulo.textContent = uf + " — resultado não disponível";
@@ -1608,13 +1918,15 @@
             caminho.setAttribute("aria-label", texto);
         }
 
-        function atualizaEstadoMapa(uf) {
-            const caminho = document.querySelector('#mapa-estados path[data-uf="' + uf + '"]');
+        function atualizaEstadoMapa(uf, turno) {
+            const grupoId = turno ? "mapa-estados-" + turno : "mapa-estados";
+            const resultados = turno ? mapaResultadosPorTurno[turno] : mapaResultados;
+            const caminho = document.querySelector('#' + grupoId + ' path[data-uf="' + uf + '"]');
             if (!caminho) {
                 return;
             }
-            caminho.setAttribute("fill", corEstadoMapa(mapaResultados[uf]));
-            atualizaTituloEstadoMapa(caminho, uf);
+            caminho.setAttribute("fill", corEstadoMapa(resultados[uf]));
+            atualizaTituloEstadoMapa(caminho, uf, resultados[uf]);
         }
 
         function resultadoCandidatoEstado(jsonApuracao) {
@@ -1629,11 +1941,58 @@
             }
             const votosFlavio = Number(flavio.vap);
             const votosLula = Number(lula.vap);
+            const percentualUrnas = resumoPercentualUrnas(jsonApuracao);
             return {
                 vencedor: votosFlavio > votosLula ? "flavio" : votosLula > votosFlavio ? "lula" : "empate",
-                urnasApuradas: jsonApuracao.s && jsonApuracao.s.pst,
+                urnasApuradas: percentualUrnas === null
+                    ? null
+                    : percentualUrnas.toLocaleString("pt-BR", {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2
+                    }),
                 flavio: flavio,
                 lula: lula
+            };
+        }
+
+        function variacaoPercentual(valorAtual, valorAnterior) {
+            if (valorAtual === undefined || valorAtual === null || valorAtual === ""
+                || valorAnterior === undefined || valorAnterior === null || valorAnterior === "") {
+                return null;
+            }
+            const atual = parseFloat(String(valorAtual).replace(",", "."));
+            const anterior = parseFloat(String(valorAnterior).replace(",", "."));
+            return Number.isFinite(atual) && Number.isFinite(anterior) ? atual - anterior : null;
+        }
+
+        function formataVariacaoPercentual(variacao) {
+            if (variacao === null || variacao === undefined) {
+                return "—";
+            }
+            const sinal = variacao > 0 ? "+" : "";
+            return sinal + variacao.toLocaleString("pt-BR", {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            }) + " p.p.";
+        }
+
+        function resultadoComparativoEstado(primeiro, segundo) {
+            if (!primeiro || !segundo) {
+                return null;
+            }
+            const variacaoFlavio = variacaoPercentual(segundo.flavio.pvap, primeiro.flavio.pvap);
+            const variacaoLula = variacaoPercentual(segundo.lula.pvap, primeiro.lula.pvap);
+            if (variacaoFlavio === null || variacaoLula === null) {
+                return null;
+            }
+            const saldoVariacao = variacaoFlavio - variacaoLula;
+            return {
+                comparativo: true,
+                vencedor: saldoVariacao > 0 ? "flavio" : saldoVariacao < 0 ? "lula" : "empate",
+                primeiro: primeiro,
+                segundo: segundo,
+                variacaoFlavio: variacaoFlavio,
+                variacaoLula: variacaoLula
             };
         }
 
@@ -1661,7 +2020,10 @@
                         linha.classList.add("selected-state");
                         linha.setAttribute("aria-current", "true");
                     }
-                    [estado.ds, "Carregando...", "—", "—"].forEach(function (valor) {
+                    const valores = turnoSelecionado === "comparativo"
+                        ? [estado.ds, "Carregando...", "Carregando...", "—", "—", "—", "—", "—", "—"]
+                        : [estado.ds, "Carregando...", "—", "—"];
+                    valores.forEach(function (valor) {
                         const celula = document.createElement("td");
                         celula.appendChild(document.createTextNode(valor));
                         linha.appendChild(celula);
@@ -1677,9 +2039,26 @@
             }
             const celulas = linha.querySelectorAll("td");
             if (!resultado) {
-                celulas[1].textContent = "Indisponível";
-                celulas[2].textContent = "—";
-                celulas[3].textContent = "—";
+                for (let index = 1; index < celulas.length; index++) {
+                    celulas[index].textContent = "—";
+                }
+                return;
+            }
+            if (resultado.comparativo) {
+                const primeiro = resultado.primeiro;
+                const segundo = resultado.segundo;
+                [
+                    textoPercentual(primeiro.urnasApuradas),
+                    textoPercentual(segundo.urnasApuradas),
+                    textoPercentualCandidato(primeiro.flavio),
+                    textoPercentualCandidato(segundo.flavio),
+                    formataVariacaoPercentual(resultado.variacaoFlavio),
+                    textoPercentualCandidato(primeiro.lula),
+                    textoPercentualCandidato(segundo.lula),
+                    formataVariacaoPercentual(resultado.variacaoLula)
+                ].forEach(function (valor, index) {
+                    celulas[index + 1].textContent = valor;
+                });
                 return;
             }
             celulas[1].textContent = textoPercentual(resultado.urnasApuradas);
@@ -1708,6 +2087,10 @@
 
         function carregaResultadosMapa(forcar) {
             if (!mapaGeometria || !configuracaoMunicipios) {
+                return;
+            }
+            if (turnoSelecionado === "comparativo") {
+                carregaResultadosMapaComparativo(forcar);
                 return;
             }
             if ((mapaResultadosCarregando && mapaTurnoCarregando === turnoSelecionado && !forcar)
@@ -1787,6 +2170,105 @@
             });
         }
 
+        function carregaResultadosMapaComparativo(forcar) {
+            if (mapaResultadosCarregando && mapaTurnoCarregando === "comparativo") {
+                return;
+            }
+            if (!forcar && Date.now() - mapaUltimaAtualizacao < 30000) {
+                return;
+            }
+
+            const geracao = ++geracaoMapa;
+            const estados = configuracaoMunicipios.filter(function (estado) {
+                return estado.cd && estado.cd.toLowerCase() !== "zz";
+            });
+            const resultadosPorTurno = { primeiro: {}, segundo: {} };
+            let concluidos = 0;
+            const estadosComErro = {};
+            mapaResultados = {};
+            mapaResultadosPorTurno = { primeiro: {}, segundo: {} };
+            mapaResultadosCarregando = true;
+            mapaTurnoCarregando = "comparativo";
+            mapaUltimaAtualizacao = Date.now();
+            renderizaMapaEstados("primeiro");
+            renderizaMapaEstados("segundo");
+            renderizaTabelaResultadosMapa();
+            atualizaStatusMapa("Carregando comparação dos dois turnos (0/" + (estados.length * 2) + ")...");
+
+            function processaResposta(estado, turno, dados, erro) {
+                if (geracao !== geracaoMapa || turnoSelecionado !== "comparativo") {
+                    return;
+                }
+                const uf = estado.cd.toUpperCase();
+                if (!erro) {
+                    resultadosPorTurno[turno][uf] = resultadoCandidatoEstado(dados);
+                    if (!resultadosPorTurno[turno][uf]) {
+                        estadosComErro[uf] = true;
+                        console.error("Não foi possível identificar os candidatos nos resultados comparativos de", uf, turno);
+                    } else {
+                        mapaResultadosPorTurno[turno][uf] = resultadosPorTurno[turno][uf];
+                        atualizaEstadoMapa(uf, turno);
+                    }
+                } else {
+                    resultadosPorTurno[turno][uf] = null;
+                    estadosComErro[uf] = true;
+                    console.error("Falha ao carregar resultados comparativos de", uf, turno, erro);
+                }
+
+                concluidos++;
+                const primeiro = resultadosPorTurno.primeiro[uf];
+                const segundo = resultadosPorTurno.segundo[uf];
+                const recebeuPrimeiro = Object.prototype.hasOwnProperty.call(resultadosPorTurno.primeiro, uf);
+                const recebeuSegundo = Object.prototype.hasOwnProperty.call(resultadosPorTurno.segundo, uf);
+                if (recebeuPrimeiro && recebeuSegundo && primeiro && segundo) {
+                    const comparativo = resultadoComparativoEstado(primeiro, segundo);
+                    if (comparativo) {
+                        atualizaLinhaResultadosMapa(uf, comparativo);
+                    } else {
+                        atualizaLinhaResultadosMapa(uf, null);
+                        estadosComErro[uf] = true;
+                    }
+                } else if (recebeuPrimeiro && recebeuSegundo) {
+                    atualizaLinhaResultadosMapa(uf, null);
+                }
+
+                atualizaStatusMapa("Carregando comparação dos dois turnos (" + concluidos + "/" + (estados.length * 2) + ")...");
+                if (concluidos === estados.length * 2) {
+                    mapaResultadosCarregando = false;
+                    mapaUltimaAtualizacao = Date.now();
+                    const estadosComResultado = Object.keys(estadosComErro);
+                    atualizaStatusMapa(estadosComResultado.length
+                        ? "Comparação parcial: dados indisponíveis para " + estadosComResultado.join(", ") + "."
+                        : "Comparação dos dois turnos carregada para todas as UFs.");
+                }
+            }
+
+            ["primeiro", "segundo"].forEach(function (turno) {
+                const eleicao = eleicoesPorTurno[turno].presidente;
+                estados.forEach(function (estado) {
+                    const uf = estado.cd.toLowerCase();
+                    const url = "https://resultados.tse.jus.br/oficial/ele2026/" + eleicao.codigo + "/dados/" + uf + "/" + uf + "-c0001-" + eleicao.id + "-u.json";
+                    const xhttp = new XMLHttpRequest();
+                    xhttp.onload = function () {
+                        if (this.status < 200 || this.status >= 300) {
+                            processaResposta(estado, turno, null, "HTTP " + this.status);
+                            return;
+                        }
+                        try {
+                            processaResposta(estado, turno, JSON.parse(this.responseText), null);
+                        } catch (error) {
+                            processaResposta(estado, turno, null, error);
+                        }
+                    };
+                    xhttp.onerror = function () {
+                        processaResposta(estado, turno, null, "erro de rede");
+                    };
+                    xhttp.open("GET", url);
+                    xhttp.send();
+                });
+            });
+        }
+
         function atualizaStatusMapa(texto) {
             document.getElementById("mapa-status").innerText = texto;
         }
@@ -1796,7 +2278,7 @@
         }
 
         function reloadApuracaoUfs() {
-            const eleicao = eleicoesPorTurno[turnoSelecionado].presidente;
+            const eleicao = eleicoesPorTurno[turnoParaDadosDoPainel()].presidente;
             const geracao = geracaoSelecao;
             const url = "https://resultados.tse.jus.br/oficial/ele2026/" + eleicao.codigo + "/dados/br/br-" + eleicao.id + "-ab.json";
             const xhttp = new XMLHttpRequest();
@@ -1867,6 +2349,9 @@
             reloadApuracaoBr();
             reloadApuracaoUfs();
             reloadApuracaoSelecionada();
+            if (turnoSelecionado === "comparativo") {
+                carregaResumoMapaComparativo();
+            }
             if (!document.getElementById("mapa-view").hidden) {
                 carregaResultadosMapa(Boolean(forcarMapa));
             }
