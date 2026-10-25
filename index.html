@@ -121,6 +121,39 @@
             font: inherit;
         }
 
+        .round-selector {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #e4eef8;
+            font-size: 0.85rem;
+            white-space: nowrap;
+        }
+
+        .round-selector-buttons {
+            display: flex;
+            padding: 3px;
+            background: rgba(7, 30, 62, 0.45);
+            border-radius: 9px;
+        }
+
+        .round-selector button {
+            padding: 7px 10px;
+            color: #e4eef8;
+            background: transparent;
+            border-radius: 7px;
+            font-size: 0.82rem;
+        }
+
+        .round-selector button[aria-pressed="true"] {
+            color: #123252;
+            background: #fff;
+        }
+
+        .round-selector button:hover {
+            transform: none;
+        }
+
         .section {
             margin-top: 34px;
         }
@@ -447,6 +480,13 @@
             <p class="description">Acompanhe os resultados no Brasil, por estado, capital e região.</p>
         </div>
         <div class="refresh-controls">
+            <div class="round-selector" role="group" aria-label="Turno da eleição">
+                <span>Turno</span>
+                <div class="round-selector-buttons">
+                    <button id="turno-primeiro" type="button" aria-pressed="true" onclick="alteraTurno('primeiro')">1º</button>
+                    <button id="turno-segundo" type="button" aria-pressed="false" onclick="alteraTurno('segundo')">2º</button>
+                </div>
+            </div>
             <p class="countdown">Próxima atualização em <span id="contador">10</span>s</p>
             <label class="state-selector" for="uf-selecionada">
                 UF
@@ -585,6 +625,17 @@
         let ufSelecionada = "sp";
         let capitalSelecionada = null;
         let geracaoSelecao = 0;
+        let turnoSelecionado = "primeiro";
+        const eleicoesPorTurno = {
+            primeiro: {
+                presidente: { codigo: "6257", id: "e006257" },
+                estadual: { codigo: "6259", id: "e006259" }
+            },
+            segundo: {
+                presidente: { codigo: "6258", id: "e006258" },
+                estadual: { codigo: "6260", id: "e006260" }
+            }
+        };
         const regioes = {
             norte: ["AC", "AM", "AP", "PA", "RO", "RR", "TO"],
             nordeste: ["AL", "BA", "CE", "MA", "PB", "PE", "PI", "RN", "SE"],
@@ -599,6 +650,18 @@
             const botao = document.getElementById("alternar-layout");
             botao.setAttribute("aria-pressed", String(visualizacaoHtmlAtiva));
             botao.innerText = visualizacaoHtmlAtiva ? "Voltar ao painel estilizado" : "Ver versão só HTML";
+        }
+
+        function alteraTurno(turno) {
+            if (!eleicoesPorTurno[turno] || turno === turnoSelecionado) {
+                return;
+            }
+
+            turnoSelecionado = turno;
+            document.getElementById("turno-primeiro").setAttribute("aria-pressed", String(turno === "primeiro"));
+            document.getElementById("turno-segundo").setAttribute("aria-pressed", String(turno === "segundo"));
+            geracaoSelecao++;
+            reloadAll();
         }
 
         function carregaConfiguracaoUfs() {
@@ -706,31 +769,55 @@
 
             const uf = ufSelecionada;
             const municipio = uf + capitalSelecionada.cd;
-            const eleicaoFederal = "e006257";
-            const eleicaoEstadual = "e006259";
+            const eleicaoFederal = eleicoesPorTurno[turnoSelecionado].presidente;
+            const eleicaoEstadual = eleicoesPorTurno[turnoSelecionado].estadual;
             const geracao = geracaoSelecao;
 
             carregaApuracao(
-                "https://resultados.tse.jus.br/oficial/ele2026/6257/dados/" + uf + "/" + uf + "-c0001-" + eleicaoFederal + "-u.json",
+                "https://resultados.tse.jus.br/oficial/ele2026/" + eleicaoFederal.codigo + "/dados/" + uf + "/" + uf + "-c0001-" + eleicaoFederal.id + "-u.json",
                 "titulo-sp-p", "apuracao-sp-p", geracao
             );
             carregaApuracao(
-                "https://resultados.tse.jus.br/oficial/ele2026/6259/dados/" + uf + "/" + uf + "-c0003-" + eleicaoEstadual + "-u.json",
+                "https://resultados.tse.jus.br/oficial/ele2026/" + eleicaoEstadual.codigo + "/dados/" + uf + "/" + uf + "-c0003-" + eleicaoEstadual.id + "-u.json",
                 "titulo-sp-g", "apuracao-sp-g", geracao
             );
+            if (turnoSelecionado === "primeiro") {
+                carregaApuracao(
+                    "https://resultados.tse.jus.br/oficial/ele2026/" + eleicaoEstadual.codigo + "/dados/" + uf + "/" + uf + "-c0005-" + eleicaoEstadual.id + "-u.json",
+                    "titulo-sp-s", "apuracao-sp-s", geracao
+                );
+                carregaTopDezDeputados(uf, geracao);
+            } else {
+                exibeCargoSemSegundoTurno("titulo-sp-s", "apuracao-sp-s");
+                exibeDeputadosSemSegundoTurno();
+            }
             carregaApuracao(
-                "https://resultados.tse.jus.br/oficial/ele2026/6259/dados/" + uf + "/" + uf + "-c0005-" + eleicaoEstadual + "-u.json",
-                "titulo-sp-s", "apuracao-sp-s", geracao
-            );
-            carregaApuracao(
-                "https://resultados.tse.jus.br/oficial/ele2026/6257/dados/" + uf + "/" + municipio + "-c0001-" + eleicaoFederal + "-u.json",
+                "https://resultados.tse.jus.br/oficial/ele2026/" + eleicaoFederal.codigo + "/dados/" + uf + "/" + municipio + "-c0001-" + eleicaoFederal.id + "-u.json",
                 "titulo-sp-p-municipio", "apuracao-sp-p-municipio", geracao
             );
             carregaApuracao(
-                "https://resultados.tse.jus.br/oficial/ele2026/6259/dados/" + uf + "/" + municipio + "-c0003-" + eleicaoEstadual + "-u.json",
+                "https://resultados.tse.jus.br/oficial/ele2026/" + eleicaoEstadual.codigo + "/dados/" + uf + "/" + municipio + "-c0003-" + eleicaoEstadual.id + "-u.json",
                 "titulo-sp-g-municipio", "apuracao-sp-g-municipio", geracao
             );
-            carregaTopDezDeputados(uf, geracao);
+        }
+
+        function exibeCargoSemSegundoTurno(tituloId, apuracaoId) {
+            document.getElementById(tituloId).innerText = "Não há segundo turno para este cargo.";
+            document.getElementById(apuracaoId).innerHTML = "";
+            document.getElementById(apuracaoId + "-totais").innerText = "";
+        }
+
+        function exibeDeputadosSemSegundoTurno() {
+            const tabela = document.getElementById("apuracao-deputados");
+            tabela.innerHTML = "";
+            const linha = document.createElement("tr");
+            const celula = document.createElement("td");
+            celula.colSpan = 6;
+            celula.appendChild(document.createTextNode("Deputados não são disputados em segundo turno."));
+            linha.appendChild(celula);
+            tabela.appendChild(linha);
+            document.getElementById("totais-deputados-federais").innerText = "";
+            document.getElementById("totais-deputados-estaduais").innerText = "";
         }
 
         function extraiTotaisVotacao(dados) {
@@ -757,8 +844,9 @@
         }
 
         function carregaTopDezDeputados(uf, geracao) {
-            const urlFederal = "https://resultados.tse.jus.br/oficial/ele2026/6259/dados/" + uf + "/" + uf + "-c0006-e006259-u.json";
-            const urlEstadual = "https://resultados.tse.jus.br/oficial/ele2026/6259/dados/" + uf + "/" + uf + "-c0007-e006259-u.json";
+            const eleicaoEstadual = eleicoesPorTurno[turnoSelecionado].estadual;
+            const urlFederal = "https://resultados.tse.jus.br/oficial/ele2026/" + eleicaoEstadual.codigo + "/dados/" + uf + "/" + uf + "-c0006-" + eleicaoEstadual.id + "-u.json";
+            const urlEstadual = "https://resultados.tse.jus.br/oficial/ele2026/" + eleicaoEstadual.codigo + "/dados/" + uf + "/" + uf + "-c0007-" + eleicaoEstadual.id + "-u.json";
             let candidatosFederais = null;
             let candidatosEstaduais = null;
             let totaisFederais = null;
@@ -970,13 +1058,19 @@
         }
 
         function reloadApuracaoBr() {
-            carregaApuracao("https://resultados.tse.jus.br/oficial/ele2026/6257/dados/br/br-c0001-e006257-u.json", "titulo", "apuracao");
+            const eleicao = eleicoesPorTurno[turnoSelecionado].presidente;
+            carregaApuracao("https://resultados.tse.jus.br/oficial/ele2026/" + eleicao.codigo + "/dados/br/br-c0001-" + eleicao.id + "-u.json", "titulo", "apuracao", geracaoSelecao);
         }
 
         function reloadApuracaoUfs() {
-            const url = "https://resultados.tse.jus.br/oficial/ele2026/6257/dados/br/br-e006257-ab.json";
+            const eleicao = eleicoesPorTurno[turnoSelecionado].presidente;
+            const geracao = geracaoSelecao;
+            const url = "https://resultados.tse.jus.br/oficial/ele2026/" + eleicao.codigo + "/dados/br/br-" + eleicao.id + "-ab.json";
             const xhttp = new XMLHttpRequest();
             xhttp.onload = function () {
+                if (geracao !== geracaoSelecao) {
+                    return;
+                }
                 if (this.status < 200 || this.status >= 300) {
                     exibeErroApuracaoUfs(url, this.status);
                     return;
@@ -1016,6 +1110,9 @@
                 }
             };
             xhttp.onerror = function () {
+                if (geracao !== geracaoSelecao) {
+                    return;
+                }
                 exibeErroApuracaoUfs(url, "erro de rede");
             };
             xhttp.open("GET", url);
