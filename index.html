@@ -63,6 +63,7 @@
             display: flex;
             flex: 0 0 auto;
             align-items: center;
+            flex-wrap: wrap;
             gap: 14px;
         }
 
@@ -152,6 +153,203 @@
 
         .round-selector button:hover {
             transform: none;
+        }
+
+        .map-view[hidden], #dashboard[hidden] {
+            display: none;
+        }
+
+        .map-summary {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 14px;
+            margin: 18px 0;
+        }
+
+        .summary-card {
+            padding: 18px 20px;
+            background: #fff;
+            border: 1px solid #e2e8f0;
+            border-radius: 14px;
+            box-shadow: 0 5px 18px rgba(25, 45, 75, 0.055);
+        }
+
+        .summary-card h3, .summary-card p {
+            margin: 0;
+        }
+
+        .summary-card h3 {
+            margin-bottom: 8px;
+            color: #53657d;
+            font-size: 0.9rem;
+        }
+
+        .summary-card strong {
+            display: block;
+            color: #18345a;
+            font-size: clamp(1.35rem, 3vw, 2rem);
+            font-variant-numeric: tabular-nums;
+        }
+
+        .summary-card p {
+            margin-top: 5px;
+            color: #64748b;
+            font-size: 0.82rem;
+        }
+
+        .summary-card.flavio strong {
+            color: #216ac0;
+        }
+
+        .summary-card.lula strong {
+            color: #d93636;
+        }
+
+        .map-panel {
+            padding: 20px;
+            background: #fff;
+            border: 1px solid #e2e8f0;
+            border-radius: 14px;
+            box-shadow: 0 5px 18px rgba(25, 45, 75, 0.055);
+        }
+
+        .map-panel h2 {
+            margin-bottom: 6px;
+            color: #182b49;
+        }
+
+        .map-layout {
+            display: grid;
+            grid-template-columns: minmax(0, 1.5fr) minmax(360px, 1fr);
+            align-items: start;
+            gap: 20px;
+        }
+
+        .map-graphic {
+            min-width: 0;
+        }
+
+        .map-status {
+            min-height: 1.5em;
+            margin-bottom: 12px;
+            color: #64748b;
+            font-size: 0.9rem;
+        }
+
+        #mapa-brasil {
+            display: block;
+            width: 100%;
+            max-height: 720px;
+            margin: 0 auto;
+        }
+
+        .map-results-table-wrap {
+            max-height: 720px;
+            overflow: auto;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+        }
+
+        .map-results-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.82rem;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .map-results-table th, .map-results-table td {
+            padding: 9px 10px;
+            text-align: right;
+            white-space: nowrap;
+            border-bottom: 1px solid #edf1f6;
+        }
+
+        .map-results-table th {
+            position: sticky;
+            top: 0;
+            z-index: 1;
+            color: #18345a;
+            background: #e8eef6;
+        }
+
+        .map-results-table th:first-child, .map-results-table td:first-child {
+            text-align: left;
+        }
+
+        .map-results-table th:nth-child(3), .map-results-table td:nth-child(3) {
+            color: #216ac0;
+        }
+
+        .map-results-table th:nth-child(4), .map-results-table td:nth-child(4) {
+            color: #d93636;
+        }
+
+        .map-results-table tbody tr {
+            cursor: pointer;
+            transition: background-color 150ms ease;
+        }
+
+        .map-results-table tbody tr:hover {
+            background: #f1f6fc;
+        }
+
+        .map-results-table tbody tr.selected-state {
+            background: #dbeafe;
+            box-shadow: inset 4px 0 #2563eb;
+        }
+
+        .map-results-table tbody tr:focus-visible {
+            outline: 2px solid #2563eb;
+            outline-offset: -2px;
+        }
+
+        .map-results-table tbody tr:last-child td {
+            border-bottom: 0;
+        }
+
+        #mapa-brasil path {
+            stroke: #fff;
+            stroke-width: 1.5;
+            stroke-linejoin: round;
+            vector-effect: non-scaling-stroke;
+            transition: fill 180ms ease, opacity 180ms ease;
+        }
+
+        #mapa-brasil path[data-uf] {
+            cursor: pointer;
+        }
+
+        #mapa-brasil path[data-uf]:hover, #mapa-brasil path[data-uf]:focus-visible {
+            stroke: #172033;
+            stroke-width: 2.5;
+            outline: none;
+        }
+
+        .map-legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 18px;
+            margin: 12px 0 0;
+            color: #53657d;
+            font-size: 0.85rem;
+        }
+
+        .map-legend span {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+        }
+
+        .legend-swatch {
+            width: 14px;
+            height: 14px;
+            border-radius: 4px;
+        }
+
+        .map-source {
+            margin: 12px 0 0;
+            color: #64748b;
+            font-size: 0.75rem;
         }
 
         .section {
@@ -387,6 +585,24 @@
                 max-width: 100%;
             }
 
+            .map-summary {
+                grid-template-columns: 1fr;
+                gap: 8px;
+            }
+
+            .map-layout {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+
+            .map-results-table-wrap {
+                max-height: 440px;
+            }
+
+            .summary-card {
+                padding: 14px 16px;
+            }
+
             .state-selector select {
                 min-width: 0;
                 max-width: 100%;
@@ -495,11 +711,12 @@
                 </select>
             </label>
             <button id="alternar-layout" type="button" aria-pressed="false" onclick="alternarVisualizacaoHtml()">Ver versão só HTML</button>
-            <button type="button" onclick="reloadAll()">Atualizar</button>
+            <button id="alternar-mapa" type="button" aria-pressed="false" onclick="alternarVisualizacaoMapa()">Ver mapa</button>
+            <button type="button" onclick="reloadAll(true)">Atualizar</button>
         </div>
     </header>
 
-    <main>
+    <main id="dashboard">
         <section class="section" aria-label="Apuração por cargo">
             <table class="data-table results-table" border="1" cellpadding="8" cellspacing="0">
                 <tr>
@@ -618,6 +835,66 @@
         </section>
     </main>
 
+    <main id="mapa-view" class="map-view" hidden>
+        <section aria-labelledby="resumo-mapa-heading">
+            <div class="section-heading">
+                <h2 id="resumo-mapa-heading">Resumo nacional · Presidente</h2>
+                <p id="resumo-mapa-turno">Resultados do primeiro turno.</p>
+            </div>
+            <div class="map-summary" aria-live="polite">
+                <article class="summary-card">
+                    <h3>Urnas apuradas</h3>
+                    <strong id="mapa-urnas">Carregando...</strong>
+                    <p id="mapa-urnas-percent"></p>
+                </article>
+                <article class="summary-card flavio">
+                    <h3>Flávio Bolsonaro</h3>
+                    <strong id="mapa-flavio-percent">Carregando...</strong>
+                    <p id="mapa-flavio-votos"></p>
+                </article>
+                <article class="summary-card lula">
+                    <h3>Lula</h3>
+                    <strong id="mapa-lula-percent">Carregando...</strong>
+                    <p id="mapa-lula-votos"></p>
+                </article>
+            </div>
+        </section>
+        <section class="section map-panel" aria-labelledby="mapa-heading">
+            <h2 id="mapa-heading">Maioria por estado</h2>
+            <p id="mapa-status" class="map-status" role="status">Carregando mapa e resultados...</p>
+            <div class="map-layout">
+                <div class="map-graphic">
+                    <svg id="mapa-brasil" viewBox="0 0 800 800" role="img" aria-labelledby="mapa-svg-titulo mapa-svg-descricao">
+                        <title id="mapa-svg-titulo">Mapa dos resultados presidenciais por estado</title>
+                        <desc id="mapa-svg-descricao">Estados azuis indicam mais votos para Flávio Bolsonaro; estados vermelhos indicam mais votos para Lula.</desc>
+                        <g id="mapa-estados"></g>
+                    </svg>
+                </div>
+                <div class="map-results-table-wrap">
+                    <table class="map-results-table">
+                        <thead>
+                            <tr>
+                                <th scope="col">Estado</th>
+                                <th scope="col">Urnas apuradas</th>
+                                <th scope="col">% Flávio</th>
+                                <th scope="col">% Lula</th>
+                            </tr>
+                        </thead>
+                        <tbody id="mapa-resultados-estados">
+                            <tr><td colspan="4">Carregando resultados por estado...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="map-legend" aria-label="Legenda do mapa">
+                <span><span class="legend-swatch" style="background:#2879d0"></span>Mais votos para Flávio Bolsonaro</span>
+                <span><span class="legend-swatch" style="background:#d93636"></span>Mais votos para Lula</span>
+                <span><span class="legend-swatch" style="background:#cbd5e1"></span>Empate ou sem resultado disponível</span>
+            </div>
+            <p class="map-source">Limites estaduais: <a href="https://github.com/codeforamerica/click_that_hood" target="_blank" rel="noopener noreferrer">Click That ’Hood</a>.</p>
+        </section>
+    </main>
+
     <script>
         let timeLeft = 10;
         let visualizacaoHtmlAtiva = false;
@@ -626,6 +903,15 @@
         let capitalSelecionada = null;
         let geracaoSelecao = 0;
         let turnoSelecionado = "primeiro";
+        let mapaGeometria = null;
+        let mapaCarregandoGeometria = false;
+        let geracaoMapa = 0;
+        let mapaResultados = {};
+        let mapaResultadosCarregando = false;
+        let mapaTurnoCarregando = null;
+        let mapaUltimaAtualizacao = 0;
+        let estadoMapaSelecionado = null;
+        const urlGeometriaMapa = "https://raw.githubusercontent.com/codeforamerica/click_that_hood/main/public/data/brazil-states.geojson";
         const eleicoesPorTurno = {
             primeiro: {
                 presidente: { codigo: "6257", id: "e006257" },
@@ -661,7 +947,25 @@
             document.getElementById("turno-primeiro").setAttribute("aria-pressed", String(turno === "primeiro"));
             document.getElementById("turno-segundo").setAttribute("aria-pressed", String(turno === "segundo"));
             geracaoSelecao++;
-            reloadAll();
+            geracaoMapa++;
+            mapaResultadosCarregando = false;
+            mapaUltimaAtualizacao = 0;
+            reloadAll(true);
+        }
+
+        function alternarVisualizacaoMapa() {
+            const mapa = document.getElementById("mapa-view");
+            const dashboard = document.getElementById("dashboard");
+            const botao = document.getElementById("alternar-mapa");
+            const mapaAtivo = mapa.hidden;
+            mapa.hidden = !mapaAtivo;
+            dashboard.hidden = mapaAtivo;
+            botao.setAttribute("aria-pressed", String(mapaAtivo));
+            botao.innerText = mapaAtivo ? "Ver painel" : "Ver mapa";
+            if (mapaAtivo) {
+                carregaGeometriaMapa();
+                carregaResultadosMapa();
+            }
         }
 
         function carregaConfiguracaoUfs() {
@@ -681,6 +985,7 @@
                     if (!configuracaoMunicipios.length) {
                         throw new Error("A configuração do TSE não contém unidades federativas.");
                     }
+                    renderizaTabelaResultadosMapa();
 
                     const selecao = document.getElementById("uf-selecionada");
                     selecao.innerHTML = "";
@@ -701,6 +1006,9 @@
                         return estado.cd.toLowerCase() === ufSelecionada;
                     }) ? ufSelecionada : configuracaoMunicipios[0].cd.toLowerCase();
                     alteraUfSelecionada();
+                    if (!document.getElementById("mapa-view").hidden) {
+                        carregaResultadosMapa(true);
+                    }
                 } catch (error) {
                     exibeErroConfiguracaoUfs(url, error);
                 }
@@ -723,6 +1031,7 @@
             ["titulo-sp-p", "titulo-sp-g", "titulo-sp-s", "titulo-sp-p-municipio", "titulo-sp-g-municipio"].forEach(function (id) {
                 document.getElementById(id).innerText = "Não foi possível carregar a lista de UFs.";
             });
+            atualizaStatusMapa("Não foi possível carregar a lista de UFs para montar os resultados do mapa.");
             console.error("Falha ao carregar configuração de UFs:", url, erro);
         }
 
@@ -966,6 +1275,9 @@
         function trataApuracaoGenerica(jsonApuracao, tituloId, apuracaoId) {
             const titulo = document.getElementById(tituloId);
             const apuracao = document.getElementById(apuracaoId);
+            if (tituloId === "titulo") {
+                atualizaResumoMapa(jsonApuracao);
+            }
             apuracao.innerHTML = "";
             document.getElementById(apuracaoId + "-totais").innerText = textoTotaisVotacao(extraiTotaisVotacao(jsonApuracao));
 
@@ -1028,6 +1340,9 @@
                 document.getElementById(tituloId).innerText = detalhe;
                 document.getElementById(apuracaoId).innerHTML = "";
                 document.getElementById(apuracaoId + "-totais").innerText = "";
+                if (tituloId === "titulo") {
+                    exibeResumoMapaIndisponivel();
+                }
             };
             xhttp.onload = function () {
                 if (geracao !== undefined && geracao !== geracaoSelecao) {
@@ -1060,6 +1375,424 @@
         function reloadApuracaoBr() {
             const eleicao = eleicoesPorTurno[turnoSelecionado].presidente;
             carregaApuracao("https://resultados.tse.jus.br/oficial/ele2026/" + eleicao.codigo + "/dados/br/br-c0001-" + eleicao.id + "-u.json", "titulo", "apuracao", geracaoSelecao);
+        }
+
+        function encontraCandidatoPresidencial(jsonApuracao, criterio) {
+            let resultado = null;
+            (jsonApuracao.carg || []).forEach(function (cargo) {
+                (cargo.agr || []).forEach(function (grupo) {
+                    (grupo.par || []).forEach(function (partido) {
+                        (partido.cand || []).forEach(function (candidato) {
+                            const nome = String(candidato.nm || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase();
+                            if (!resultado && criterio(nome)) {
+                                resultado = candidato;
+                            }
+                        });
+                    });
+                });
+            });
+            return resultado;
+        }
+
+        function atualizaResumoMapa(jsonApuracao) {
+            const secoesApuradas = jsonApuracao.s && jsonApuracao.s.si;
+            const secoesTotais = jsonApuracao.s && jsonApuracao.s.ts;
+            document.getElementById("resumo-mapa-turno").innerText = "Resultados do " + (turnoSelecionado === "primeiro" ? "primeiro" : "segundo") + " turno.";
+            document.getElementById("mapa-urnas").innerText = secoesApuradas !== undefined && secoesTotais !== undefined
+                ? formataTotalVotacao(secoesApuradas) + " / " + formataTotalVotacao(secoesTotais)
+                : "Indisponível";
+            const quantidadeUrnasApuradas = Number(secoesApuradas);
+            const quantidadeUrnasTotal = Number(secoesTotais);
+            document.getElementById("mapa-urnas-percent").innerText = Number.isFinite(quantidadeUrnasApuradas)
+                && Number.isFinite(quantidadeUrnasTotal) && quantidadeUrnasTotal > 0
+                ? (quantidadeUrnasApuradas / quantidadeUrnasTotal * 100).toLocaleString("pt-BR", {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                }) + "% de urnas apuradas"
+                : "";
+
+            const flavio = encontraCandidatoPresidencial(jsonApuracao, function (nome) {
+                return nome.indexOf("FLAVIO") >= 0 && nome.indexOf("BOLSONARO") >= 0;
+            });
+            const lula = encontraCandidatoPresidencial(jsonApuracao, function (nome) {
+                return nome.indexOf("LULA") >= 0;
+            });
+            document.getElementById("mapa-flavio-percent").innerText = textoPercentualCandidato(flavio);
+            document.getElementById("mapa-flavio-votos").innerText = flavio ? formataTotalVotacao(flavio.vap) + " votos" : "";
+            document.getElementById("mapa-lula-percent").innerText = textoPercentualCandidato(lula);
+            document.getElementById("mapa-lula-votos").innerText = lula ? formataTotalVotacao(lula.vap) + " votos" : "";
+        }
+
+        function textoPercentualCandidato(candidato) {
+            return candidato && candidato.pvap !== undefined && candidato.pvap !== ""
+                ? candidato.pvap + "%"
+                : "Indisponível";
+        }
+
+        function exibeResumoMapaIndisponivel() {
+            document.getElementById("resumo-mapa-turno").innerText = "Não foi possível carregar o resumo deste turno.";
+            ["mapa-urnas", "mapa-flavio-percent", "mapa-lula-percent"].forEach(function (id) {
+                document.getElementById(id).innerText = "Indisponível";
+            });
+            ["mapa-urnas-percent", "mapa-flavio-votos", "mapa-lula-votos"].forEach(function (id) {
+                document.getElementById(id).innerText = "";
+            });
+        }
+
+        function carregaGeometriaMapa() {
+            if (mapaGeometria) {
+                renderizaMapaEstados();
+                carregaResultadosMapa();
+                return;
+            }
+            if (mapaCarregandoGeometria) {
+                return;
+            }
+
+            mapaCarregandoGeometria = true;
+            const xhttp = new XMLHttpRequest();
+            xhttp.onload = function () {
+                mapaCarregandoGeometria = false;
+                if (this.status < 200 || this.status >= 300) {
+                    exibeErroMapa("Não foi possível carregar os limites dos estados (HTTP " + this.status + ").");
+                    console.error("Falha ao carregar geometria do mapa:", urlGeometriaMapa, this.status);
+                    return;
+                }
+
+                try {
+                    const dados = JSON.parse(this.responseText);
+                    if (!dados.features || !dados.features.length) {
+                        throw new Error("O arquivo não contém estados.");
+                    }
+                    mapaGeometria = dados;
+                    renderizaMapaEstados();
+                    carregaResultadosMapa(true);
+                } catch (error) {
+                    exibeErroMapa("Não foi possível interpretar os limites dos estados.");
+                    console.error("Resposta inválida da geometria do mapa:", urlGeometriaMapa, error);
+                }
+            };
+            xhttp.onerror = function () {
+                mapaCarregandoGeometria = false;
+                exibeErroMapa("Não foi possível carregar os limites dos estados (erro de rede).");
+                console.error("Erro de rede ao carregar geometria do mapa:", urlGeometriaMapa);
+            };
+            xhttp.open("GET", urlGeometriaMapa);
+            xhttp.send();
+        }
+
+        function visitaCoordenadas(coordenadas, aoVisitar) {
+            if (!Array.isArray(coordenadas)) {
+                return;
+            }
+            if (typeof coordenadas[0] === "number" && typeof coordenadas[1] === "number") {
+                aoVisitar(coordenadas);
+                return;
+            }
+            coordenadas.forEach(function (item) {
+                visitaCoordenadas(item, aoVisitar);
+            });
+        }
+
+        function projetaCoordenada(coordenada, limites) {
+            return {
+                x: limites.offsetX + (coordenada[0] - limites.minLon) * limites.escala,
+                y: limites.offsetY + (limites.maxLat - coordenada[1]) * limites.escala
+            };
+        }
+
+        function caminhoGeometriaMapa(geometria, limites) {
+            const poligonos = geometria.type === "Polygon"
+                ? [geometria.coordinates]
+                : geometria.type === "MultiPolygon" ? geometria.coordinates : [];
+            const comandos = [];
+            poligonos.forEach(function (poligono) {
+                poligono.forEach(function (anel) {
+                    let pontoAnterior = null;
+                    anel.forEach(function (coordenada, index) {
+                        const ponto = projetaCoordenada(coordenada, limites);
+                        const dx = ponto.x - (pontoAnterior ? pontoAnterior.x : 0);
+                        const dy = ponto.y - (pontoAnterior ? pontoAnterior.y : 0);
+                        if (index === 0 || index === anel.length - 1 || dx * dx + dy * dy >= 1) {
+                            comandos.push((index === 0 ? "M" : "L")
+                                + (Math.round(ponto.x * 10) / 10) + " "
+                                + (Math.round(ponto.y * 10) / 10));
+                            pontoAnterior = ponto;
+                        }
+                    });
+                    comandos.push("Z");
+                });
+            });
+            return comandos.join("");
+        }
+
+        function renderizaMapaEstados() {
+            const grupo = document.getElementById("mapa-estados");
+            grupo.innerHTML = "";
+            if (!mapaGeometria) {
+                return;
+            }
+
+            const limites = { minLon: Infinity, maxLon: -Infinity, minLat: Infinity, maxLat: -Infinity };
+            mapaGeometria.features.forEach(function (feature) {
+                visitaCoordenadas(feature.geometry.coordinates, function (coordenada) {
+                    limites.minLon = Math.min(limites.minLon, coordenada[0]);
+                    limites.maxLon = Math.max(limites.maxLon, coordenada[0]);
+                    limites.minLat = Math.min(limites.minLat, coordenada[1]);
+                    limites.maxLat = Math.max(limites.maxLat, coordenada[1]);
+                });
+            });
+
+            const margem = 20;
+            limites.escala = Math.min(
+                (800 - margem * 2) / (limites.maxLon - limites.minLon),
+                (800 - margem * 2) / (limites.maxLat - limites.minLat)
+            );
+            limites.offsetX = (800 - (limites.maxLon - limites.minLon) * limites.escala) / 2;
+            limites.offsetY = (800 - (limites.maxLat - limites.minLat) * limites.escala) / 2;
+
+            mapaGeometria.features.forEach(function (feature) {
+                const uf = (feature.properties.sigla || "").toUpperCase();
+                if (!uf) {
+                    return;
+                }
+                const caminho = document.createElementNS("http://www.w3.org/2000/svg", "path");
+                caminho.setAttribute("d", caminhoGeometriaMapa(feature.geometry, limites));
+                caminho.setAttribute("data-uf", uf);
+                caminho.setAttribute("tabindex", "0");
+                caminho.setAttribute("role", "button");
+                caminho.setAttribute("fill", corEstadoMapa(mapaResultados[uf]));
+                caminho.appendChild(document.createElementNS("http://www.w3.org/2000/svg", "title"));
+                grupo.appendChild(caminho);
+                caminho.addEventListener("click", function () {
+                    destacaEstadoNaTabela(uf);
+                });
+                caminho.addEventListener("keydown", function (event) {
+                    if (event.key === "Enter" || event.key === " ") {
+                        event.preventDefault();
+                        destacaEstadoNaTabela(uf);
+                    }
+                });
+                atualizaTituloEstadoMapa(caminho, uf);
+            });
+        }
+
+        function corEstadoMapa(resultado) {
+            if (!resultado || resultado.vencedor === "empate") {
+                return "#cbd5e1";
+            }
+
+            const corBase = resultado.vencedor === "flavio" ? [40, 121, 208] : [217, 54, 54];
+            const percentualApurado = parseFloat(String(resultado.urnasApuradas || "0").replace(",", ".")) || 0;
+            const intensidade = 0.25 + Math.min(100, Math.max(0, percentualApurado)) / 100 * 0.75;
+            const cor = corBase.map(function (canal) {
+                return Math.round(255 - (255 - canal) * intensidade);
+            });
+            return "#" + cor.map(function (canal) {
+                return canal.toString(16).padStart(2, "0");
+            }).join("");
+        }
+
+        function atualizaTituloEstadoMapa(caminho, uf) {
+            const resultado = mapaResultados[uf];
+            const titulo = caminho.querySelector("title");
+            if (!resultado) {
+                titulo.textContent = uf + " — resultado não disponível";
+                caminho.setAttribute("aria-label", uf + ": resultado não disponível");
+                return;
+            }
+            const texto = uf + " — Urnas apuradas: " + textoPercentual(resultado.urnasApuradas)
+                + "; Flávio Bolsonaro: " + textoPercentualCandidato(resultado.flavio)
+                + "; Lula: " + textoPercentualCandidato(resultado.lula);
+            titulo.textContent = texto;
+            caminho.setAttribute("aria-label", texto);
+        }
+
+        function atualizaEstadoMapa(uf) {
+            const caminho = document.querySelector('#mapa-estados path[data-uf="' + uf + '"]');
+            if (!caminho) {
+                return;
+            }
+            caminho.setAttribute("fill", corEstadoMapa(mapaResultados[uf]));
+            atualizaTituloEstadoMapa(caminho, uf);
+        }
+
+        function resultadoCandidatoEstado(jsonApuracao) {
+            const flavio = encontraCandidatoPresidencial(jsonApuracao, function (nome) {
+                return nome.indexOf("FLAVIO") >= 0 && nome.indexOf("BOLSONARO") >= 0;
+            });
+            const lula = encontraCandidatoPresidencial(jsonApuracao, function (nome) {
+                return nome.indexOf("LULA") >= 0;
+            });
+            if (!flavio || !lula || !Number.isFinite(Number(flavio.vap)) || !Number.isFinite(Number(lula.vap))) {
+                return null;
+            }
+            const votosFlavio = Number(flavio.vap);
+            const votosLula = Number(lula.vap);
+            return {
+                vencedor: votosFlavio > votosLula ? "flavio" : votosLula > votosFlavio ? "lula" : "empate",
+                urnasApuradas: jsonApuracao.s && jsonApuracao.s.pst,
+                flavio: flavio,
+                lula: lula
+            };
+        }
+
+        function textoPercentual(valor) {
+            return valor !== undefined && valor !== null && valor !== "" ? valor + "%" : "—";
+        }
+
+        function renderizaTabelaResultadosMapa() {
+            const corpo = document.getElementById("mapa-resultados-estados");
+            corpo.innerHTML = "";
+            if (!configuracaoMunicipios) {
+                return;
+            }
+
+            configuracaoMunicipios
+                .slice()
+                .sort(function (a, b) {
+                    return a.ds.localeCompare(b.ds, "pt-BR");
+                })
+                .forEach(function (estado) {
+                    const uf = estado.cd.toUpperCase();
+                    const linha = document.createElement("tr");
+                    linha.setAttribute("data-uf", uf);
+                    if (uf === estadoMapaSelecionado) {
+                        linha.classList.add("selected-state");
+                        linha.setAttribute("aria-current", "true");
+                    }
+                    [estado.ds, "Carregando...", "—", "—"].forEach(function (valor) {
+                        const celula = document.createElement("td");
+                        celula.appendChild(document.createTextNode(valor));
+                        linha.appendChild(celula);
+                    });
+                    corpo.appendChild(linha);
+                });
+        }
+
+        function atualizaLinhaResultadosMapa(uf, resultado) {
+            const linha = document.querySelector('#mapa-resultados-estados tr[data-uf="' + uf + '"]');
+            if (!linha) {
+                return;
+            }
+            const celulas = linha.querySelectorAll("td");
+            if (!resultado) {
+                celulas[1].textContent = "Indisponível";
+                celulas[2].textContent = "—";
+                celulas[3].textContent = "—";
+                return;
+            }
+            celulas[1].textContent = textoPercentual(resultado.urnasApuradas);
+            celulas[2].textContent = textoPercentualCandidato(resultado.flavio);
+            celulas[3].textContent = textoPercentualCandidato(resultado.lula);
+        }
+
+        function destacaEstadoNaTabela(uf) {
+            estadoMapaSelecionado = uf;
+            const linhas = document.querySelectorAll("#mapa-resultados-estados tr[data-uf]");
+            let linhaSelecionada = null;
+            linhas.forEach(function (linha) {
+                const selecionada = linha.getAttribute("data-uf") === uf;
+                linha.classList.toggle("selected-state", selecionada);
+                if (selecionada) {
+                    linha.setAttribute("aria-current", "true");
+                    linhaSelecionada = linha;
+                } else {
+                    linha.removeAttribute("aria-current");
+                }
+            });
+            if (linhaSelecionada) {
+                linhaSelecionada.scrollIntoView({ behavior: "smooth", block: "nearest" });
+            }
+        }
+
+        function carregaResultadosMapa(forcar) {
+            if (!mapaGeometria || !configuracaoMunicipios) {
+                return;
+            }
+            if ((mapaResultadosCarregando && mapaTurnoCarregando === turnoSelecionado && !forcar)
+                || (!forcar && Date.now() - mapaUltimaAtualizacao < 30000)) {
+                return;
+            }
+
+            const geracao = ++geracaoMapa;
+            const turno = turnoSelecionado;
+            const eleicao = eleicoesPorTurno[turno].presidente;
+            const estados = configuracaoMunicipios.filter(function (estado) {
+                return estado.cd && estado.cd.toLowerCase() !== "zz";
+            });
+            let concluidos = 0;
+            const estadosComErro = [];
+            mapaResultados = {};
+            mapaResultadosCarregando = true;
+            mapaTurnoCarregando = turno;
+            mapaUltimaAtualizacao = Date.now();
+            renderizaMapaEstados();
+            renderizaTabelaResultadosMapa();
+            atualizaStatusMapa("Carregando resultados por UF (0/" + estados.length + ")...");
+
+            function processaResposta(estado, dados, erro) {
+                if (geracao !== geracaoMapa || turno !== turnoSelecionado) {
+                    return;
+                }
+                const uf = estado.cd.toUpperCase();
+                if (!erro) {
+                    const resultado = resultadoCandidatoEstado(dados);
+                    if (resultado) {
+                        mapaResultados[uf] = resultado;
+                        atualizaEstadoMapa(uf);
+                        atualizaLinhaResultadosMapa(uf, resultado);
+                    } else {
+                        atualizaLinhaResultadosMapa(uf, null);
+                        estadosComErro.push(uf);
+                        console.error("Não foi possível identificar Flávio Bolsonaro e Lula nos resultados de", uf);
+                    }
+                } else {
+                    atualizaLinhaResultadosMapa(uf, null);
+                    estadosComErro.push(uf);
+                    console.error("Falha ao carregar resultados presidenciais de", uf, erro);
+                }
+
+                concluidos++;
+                atualizaStatusMapa("Carregando resultados por UF (" + concluidos + "/" + estados.length + ")...");
+                if (concluidos === estados.length) {
+                    mapaResultadosCarregando = false;
+                    mapaUltimaAtualizacao = Date.now();
+                    atualizaStatusMapa(estadosComErro.length
+                        ? "Resultados parciais: indisponíveis para " + estadosComErro.join(", ") + "."
+                        : "Resultados carregados para todas as UFs.");
+                }
+            }
+
+            estados.forEach(function (estado) {
+                const uf = estado.cd.toLowerCase();
+                const url = "https://resultados.tse.jus.br/oficial/ele2026/" + eleicao.codigo + "/dados/" + uf + "/" + uf + "-c0001-" + eleicao.id + "-u.json";
+                const xhttp = new XMLHttpRequest();
+                xhttp.onload = function () {
+                    if (this.status < 200 || this.status >= 300) {
+                        processaResposta(estado, null, "HTTP " + this.status);
+                        return;
+                    }
+                    try {
+                        processaResposta(estado, JSON.parse(this.responseText), null);
+                    } catch (error) {
+                        processaResposta(estado, null, error);
+                    }
+                };
+                xhttp.onerror = function () {
+                    processaResposta(estado, null, "erro de rede");
+                };
+                xhttp.open("GET", url);
+                xhttp.send();
+            });
+        }
+
+        function atualizaStatusMapa(texto) {
+            document.getElementById("mapa-status").innerText = texto;
+        }
+
+        function exibeErroMapa(texto) {
+            atualizaStatusMapa(texto);
         }
 
         function reloadApuracaoUfs() {
@@ -1130,10 +1863,13 @@
             console.error("Falha ao carregar apuração por UF:", url, erro);
         }
 
-        function reloadAll() {
+        function reloadAll(forcarMapa) {
             reloadApuracaoBr();
             reloadApuracaoUfs();
             reloadApuracaoSelecionada();
+            if (!document.getElementById("mapa-view").hidden) {
+                carregaResultadosMapa(Boolean(forcarMapa));
+            }
             timeLeft = 10;
         }
 
